@@ -183,15 +183,16 @@ class LogisticRegression(UsageFunction):
         # Calcuate the number of parameter updates
         step = 1
 
+        # Mini-batch training
+        mini_bach = int(np.floor(train_size / self.batch_size))
+        
         # Iterative training
         for epoch in range(self.max_iter):
             # Random shuffle at the begging of each epoch
             X_train, Y_train = self._shuffle(X_train, Y_train)
-            # Mini-batch training
-            mini_bach = int(np.floor(train_size / self.batch_size))
-
+            
             for idx in range(mini_bach):
-                print(f"Epoch: {epoch} [{idx}/{mini_bach}]", end= '\r')
+                print(f"Epoch: {epoch} [{idx}/{mini_bach} with batch size {self.batch_size}]", end= '\r')
                 mini_bach_index = list(range(idx*self.batch_size, (idx+1)*self.batch_size))
                 X = X_train[mini_bach_index]
                 Y = Y_train[mini_bach_index]
@@ -216,7 +217,7 @@ class LogisticRegression(UsageFunction):
             Y_dev_pred = np.round(y_dev_pred)
             self.dev_acc.append(self._accuracy(Y_dev_pred, Y_dev))
             self.dev_loss.append(self._cross_entropy_loss(y_dev_pred, Y_dev) / dev_size)
-
+        print(f"Complete {epoch+1} epochs, each {mini_bach} mini-batch with batch size {self.batch_size}")
         print('Training loss: {}'.format(self.train_loss[-1]))
         print('Development loss: {}'.format(self.dev_loss[-1]))
         print('Training accuracy: {}'.format(self.train_acc[-1]))
