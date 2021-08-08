@@ -4,8 +4,8 @@ Problem
 Binary classification, to predict the income of an indivisual
 exceeds 50,000 or not.
 
-Training
-========
+case(i). Training of Logistic regression
+========================================
 Mini-batch gradient descent is used here, in which training data
 are split into several mini-batches and each batch is feed into
 the model sequentially for losses and gradients computation.
@@ -17,6 +17,10 @@ it again. We repeat such process until max number of iterations
 is reached.
 
 我們使用小批次梯度下降法來訓練。訓練資料被分為許多小批次，針對每一個小批次，我們分別計算其梯度以及損失，並根據該批次來更新模型的參數。當一次迴圈完成，也就是整個訓練集的所有小批次都被使用過一次以後，我們將所有訓練資料打散並且重新分成新的小批次，進行下一個迴圈，直到事先設定的迴圈數量達成為止。
+
+case(ii). LDA with closed-form sample mean and covariance matrix
+================================================================
+See more in `LinearDicriminantAnalysis.__doc__`
 """
 import os
 import numpy as np
@@ -25,21 +29,25 @@ from typing import Tuple
 
 class PrepareData:
 
-    def _load_data_from_disk(self, file_path = r"E:/Download/dataset/data/"):
+    def __init__(self, file_path = r"E:/Download/dataset/data/") -> None:
+        self.file_path = file_path
+
+
+    def _load_data_from_disk(self):
         """Load and parse csv files to np.array.  
         where `file_path` is data path with default: "E:/Download/dataset/data/"
 
         該數據集包含從美國人口普查局進行的1994年和1995年的當前人口調查中提取的加權普查數據。數據包含41個與人口和就業相關的變量
         """
-        with open(os.path.join(file_path, "X_train")) as f:
+        with open(os.path.join(self.file_path, "X_train")) as f:
             next(f) # first line is columns info
             X_train = np.array([line.strip('\n').split(',')[1:] for line in f], dtype = float)
 
-        with open(os.path.join(file_path, "Y_train")) as f:
+        with open(os.path.join(self.file_path, "Y_train")) as f:
             next(f)
             Y_train = np.array([line.strip('\n').split(',')[1] for line in f], dtype = float)
 
-        with open(os.path.join(file_path, "X_test")) as f:
+        with open(os.path.join(self.file_path, "X_test")) as f:
             next(f)
             X_test = np.array([line.strip('\n').split(',')[1:] for line in f], dtype = float)
         return X_train, Y_train, X_test
@@ -84,7 +92,8 @@ class PrepareData:
         
         # Normalize training and testing data
         X_train, X_mean, X_std = self._normalize(X_train, train = True)
-        # X_test, _, _ = self._normalize(X_test, train = False, specified_column = None, X_mean = X_mean, X_std = X_std)
+        X_test, _, _ = self._normalize(X_test, train = False,
+                                       X_mean = X_mean, X_std = X_std)
 
         # Split data into training set and development set
         X_train, Y_train, X_dev, Y_dev = self._train_dev_split(X_train, Y_train, dev_ratio = 0.1)
@@ -93,7 +102,7 @@ class PrepareData:
         print('Size of development set: {}'.format(X_dev.shape[0]))
         print('Size of testing set: {}'.format(X_test.shape[0]))
         print('Dimension of data: {}'.format(X_train.shape[1]))
-        return X_train, Y_train, X_dev, Y_dev
+        return X_train, Y_train, X_dev, Y_dev, X_test
 
 
 class UsageFunction:
@@ -225,20 +234,80 @@ class LogisticRegression(UsageFunction):
         return self
 
 
+class LinearDicriminantAnalysis:
+    """LDA approaches the problem by assuming that the conditional probability
+    density functions P(X|Y=0) and P(X|Y=1) are both the normal distribution with
+    mean and covariance (mean_0, cov_0), (mean_1, cov_1). Moreover, it
+    makes the additional simplifying homoscedasticity assumption (i.e. that the class covariances are identical)
+    
+    Reference: [LDA in wiki](https://en.wikipedia.org/wiki/Linear_discriminant_analysis)
+    """
+    @staticmethod
+    def LDA_generative_model(X_train, Y_train, feature_dim):
+        # Compute in-class mean
+        X_train_0 = np.array([x for x, y in zip(X_train, Y_train) if y == 0])
+        X_train_1 = np.array([x for x, y in zip(X_train, Y_train) if y == 1])
+        mean_0 = np.mean(X_train_0, axis = 0)
+        mean_1 = np.mean(X_train_1, axis = 0)  
+
+        # Compute in-class covariance
+        cov_0 = np.zeros((feature_dim, feature_dim))
+        cov_1 = np.zeros((feature_dim, feature_dim))
+        for x in X_train_0:
+            cov_0 += np.dot(np.transpose([x - mean_0]), [x - mean_0]) / X_train_0.shape[0]
+        for x in X_train_1:
+            cov_1 += np.dot(np.transpose([x - mean_1]), [x - mean_1]) / X_train_1.shape[0]
+
+        # Shared covariance is taken as a weighted average of individual in-class covariance.
+        cov = (cov_0 * X_train_0.shape[0] + cov_1 * X_train_1.shape[0]) / (X_train_0.shape[0] + X_train_1.shape[0])
+
+        # Compute inverse of covariance matrix.
+        # Since covariance matrix may be nearly singular, np.linalg.inv() may give a large numerical error.
+        # Via SVD decomposition, one can get matrix inverse efficiently and accurately.
+        u, s, v = np.linalg.svd(cov, full_matrices=False)
+        inv = np.matmul(v.T * 1 / s, u.T)
+
+        # Directly compute weights and bias
+        w = np.dot(inv, mean_0 - mean_1)
+        b =  (-0.5) * np.dot(mean_0, np.dot(inv, mean_0)) + 0.5 * np.dot(mean_1, np.dot(inv, mean_1))\
+            + np.log(float(X_train_0.shape[0]) / X_train_1.shape[0]) 
+
+        # Compute accuracy on training set
+        Y_train_pred = 1 - UsageFunction()._predict(X_train, w, b) # since it predict P(Y=0|X) with ">0.5" = 1, otherwise = 0.
+        print('Training accuracy: {}'.format(UsageFunction()._accuracy(Y_train_pred, Y_train)))
+        return w, b
+
+
+# Print out the most significant weights
+def print_significant_weight(w, file_path):
+    ind = np.argsort(np.abs(w))[::-1]
+    with open(os.path.join(file_path, 'X_test')) as f:
+        content = f.readline().strip('\n').split(',')
+    features = np.array(content)
+    for i in ind[0:10]:
+        print(features[i], w[i])
+
+
 if __name__ == "__main__":
     
     np.random.seed(0) 
-    
-    # Preparing data    
-    X_train, Y_train, X_dev, Y_dev = PrepareData().loading_entry()
-    data_dim = X_train.shape[1]
+
+    # Preparing data
+    preparedata = PrepareData(file_path=r"E:/Download/dataset/data/")
+    X_train, Y_train, X_dev, Y_dev, X_test = preparedata.loading_entry()
+    feature_dim = X_train.shape[1]
 
     # Logistic Regression with gradient descent
-    logisticregression = LogisticRegression(w = np.zeros((data_dim,)),
+    logisticregression = LogisticRegression(w = np.zeros((feature_dim,)),
                                             b = np.zeros((1,)))
     logisticregression.gradient_descent(X_Y_train_dev = (X_train, Y_train, X_dev, Y_dev))
 
-    
+    # print("attributes", [ele for ele in dir(logisticregression) if not '__' in ele])
+    w = logisticregression.w
+    b = logisticregression.b
+    predictions = UsageFunction()._predict(X_test, w, b)
+    print_significant_weight(w, preparedata.file_path)
+
     # Plotting loss and accuracy curve
     import matplotlib.pyplot as plt
     plt.plot(logisticregression.train_loss)
@@ -255,3 +324,13 @@ if __name__ == "__main__":
     plt.legend(['train', 'dev'])
     # plt.savefig('acc.png')
     plt.show()
+
+
+    # LDA with closed-form sample mean and covariance matrix
+    print("Start LDA...")
+    w_lda, b_lda = LinearDicriminantAnalysis.LDA_generative_model(X_train, Y_train, feature_dim)
+    predictions_lda = 1 - UsageFunction()._predict(X_test, w_lda, b_lda) # 1 - (mark of Y=0)
+    print_significant_weight(w_lda, preparedata.file_path)
+
+
+    print("All done.")
