@@ -1,18 +1,18 @@
-# """ [Optimizing Model Parameter](https://pytorch.org/tutorials/beginner/basics/optimization_tutorial.html)
+""" [Optimizing Model Parameter](https://pytorch.org/tutorials/beginner/basics/optimization_tutorial.html)
 
-# Modeling Architect
-# ==================
-#     1. you have a ML problem and given data
-#     2. build appropriate model
-#     3. train, validate and test the model by
-#        optimizing its parameters on data
-#         - In each epoch,
-#           a. the model makes a guess about output
-#           b. calculates the error (loss)
-#           c. collect the derivatives of the loss function w.r.t parameters
-#           d. optimzies these parameters using gradient descent
+Modeling Architect
+==================
+    1. you have a ML problem and given data
+    2. build appropriate model
+    3. train, validate and test the model by
+       optimizing its parameters on data
+        - In each epoch,
+          a. the model makes a guess about output
+          b. calculates the error (loss)
+          c. collect the derivatives of the loss function w.r.t parameters
+          d. optimzies these parameters using gradient descent
 
-# """
+"""
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
