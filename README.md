@@ -1,3 +1,7 @@
+## Machine Learning 2020 Spring, Hung-yi Lee
+
+[Syllabus](http://speech.ee.ntu.edu.tw/~tlkagk/courses_ML20.html)
+
 ## [Machine Learning HW2 Classification](https://colab.research.google.com/drive/1k6uHcnNbQwuttgSK2ekE5LzpefJeBt6k)
 #### **Task - Income high or low**
 Problem: Binary classification, to predict the income of an indivisual exceeds 50,000 or not.
