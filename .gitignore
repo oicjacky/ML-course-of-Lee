@@ -1,3 +1,6 @@
+# kernel.json
+share\jupyter\kernels\python3\kernel.json
+
 # json files
 *.json
 
