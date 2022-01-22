@@ -1,3 +1,4 @@
+import configparser
 import torch
 import numpy as np
 # import pandas as pd
@@ -41,9 +42,11 @@ def evaluation(outputs, labels):
     return correct
 
 
-TRAIN_DATA_PATH = r"E:\Download\dataset\TextSentimentClassification\training_label.txt"
-TRAIN_NOLABEL_DATA_PATH = r"E:\Download\dataset\TextSentimentClassification\training_nolabel.txt"
-TEST_DATA_PATH = r"E:\Download\dataset\TextSentimentClassification\testing_data.txt"
+config = configparser.ConfigParser()
+config.read(r'./config.ini')
+TRAIN_DATA_PATH = config.get('Path', 'TRAIN_DATA_PATH')
+TRAIN_NOLABEL_DATA_PATH = config.get('Path', 'TRAIN_NOLABEL_DATA_PATH')
+TEST_DATA_PATH = config.get('Path', 'TEST_DATA_PATH')
 
 
 if __name__ == '__main__':
