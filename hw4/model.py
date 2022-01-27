@@ -12,7 +12,7 @@ class LSTM_Net(nn.Module):
     def __init__(self, embedding, embedding_dim, hidden_dim, num_layers,
                  dropout=0.5, fix_embedding=True):
         super(LSTM_Net, self).__init__()
-        # 製作 embedding layer
+        # 製作 embedding layer, 以embedding_matrix為weight製作torch.nn.Embedding, 之後給word index就會回傳embedding vector.
         self.embedding = torch.nn.Embedding(embedding.size(0),embedding.size(1))
         self.embedding.weight = torch.nn.Parameter(embedding)
         # 是否將 embedding fix 住，如果 fix_embedding 為 False，在訓練過程中，embedding 也會跟著被訓練

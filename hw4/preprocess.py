@@ -6,7 +6,12 @@ import torch
 from gensim.models import Word2Vec
 
 class Preprocess():
-
+    '''
+    0. Initialize with `make_embedding`
+    1. Then, generate X and Y with
+        X = Preprocess().sentence_word2idx()
+        Y = Preprocess().labels_to_tensor(y)
+    '''
     def __init__(self, sentences, sen_len, w2v_path="./w2v.model"):
         self.w2v_path = w2v_path
         self.sentences = sentences
