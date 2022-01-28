@@ -44,9 +44,22 @@ def evaluation(outputs, labels):
 
 config = configparser.ConfigParser()
 config.read(r'./config.ini')
-TRAIN_DATA_PATH = config.get('Path', 'TRAIN_DATA_PATH')
-TRAIN_NOLABEL_DATA_PATH = config.get('Path', 'TRAIN_NOLABEL_DATA_PATH')
-TEST_DATA_PATH = config.get('Path', 'TEST_DATA_PATH')
+TRAIN_DATA_PATH = config.get('Data', 'TRAIN_DATA_PATH')
+TRAIN_NOLABEL_DATA_PATH = config.get('Data', 'TRAIN_NOLABEL_DATA_PATH')
+TEST_DATA_PATH = config.get('Data', 'TEST_DATA_PATH')
+
+MODEL_CONFIG = dict(
+    embedding_dim = config.getint('Model', 'embedding_dim'),
+    hidden_dim = config.getint('Model', 'hidden_dim'),
+    num_layers = config.getint('Model', 'num_layers'),
+    dropout = config.getfloat('Model', 'dropout'),
+    w2v_path = config.get('Model', 'w2v_path'),
+    sen_len = config.getint('Model', 'sen_len'),
+    batch_size = config.getint('Model', 'batch_size'),
+    epoch = config.getint('Model', 'epoch'),
+    lr = config.getfloat('Model', 'lr'),
+)
+    
 
 
 if __name__ == '__main__':

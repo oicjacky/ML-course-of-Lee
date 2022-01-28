@@ -9,7 +9,8 @@ import pandas as pd
 from torch import nn
 from gensim.models import word2vec
 from sklearn.model_selection import train_test_split
-from utils import TRAIN_DATA_PATH, TRAIN_NOLABEL_DATA_PATH, TEST_DATA_PATH, load_training_data, load_testing_data
+from utils import (TRAIN_DATA_PATH, TRAIN_NOLABEL_DATA_PATH, TEST_DATA_PATH, MODEL_CONFIG, 
+                    load_training_data, load_testing_data)
 from preprocess import Preprocess, TwitterDataset
 from model import LSTM_Net, training, testing
 
@@ -22,14 +23,20 @@ def main():
     train_with_label = TRAIN_DATA_PATH
     train_no_label = TRAIN_NOLABEL_DATA_PATH
     testing_data = TEST_DATA_PATH
-    w2v_path = r'C:\Users\user\Pyvirtualenv\course_CNN\hw4\w2v_all.model' # 處理 word to vec model 的路徑
+    w2v_path = MODEL_CONFIG['w2v_path'] # 處理 word to vec model 的路徑
 
     # 定義句子長度、要不要固定 embedding、batch 大小、要訓練幾個 epoch、learning rate 的值、model 的資料夾路徑
-    sen_len = 20
     fix_embedding = True # fix embedding during training
-    batch_size = 128
-    epoch = 5
-    lr = 0.001
+    sen_len = MODEL_CONFIG['sen_len']
+    batch_size = MODEL_CONFIG['batch_size']
+    epoch = MODEL_CONFIG['epoch']
+    lr = MODEL_CONFIG['lr']
+    embedding_dim = MODEL_CONFIG['embedding_dim']
+    hidden_dim = MODEL_CONFIG['hidden_dim']
+    num_layers = MODEL_CONFIG['num_layers']
+    dropout = MODEL_CONFIG['dropout']
+    num_workers = 2
+
     # model_dir = os.path.join(path_prefix, 'model/') # model directory for checkpoint model
     model_dir = r'.' # model directory for checkpoint model
 
@@ -44,7 +51,7 @@ def main():
     y = preprocess.labels_to_tensor(y)
 
     # 製作一個 model 的對象
-    model = LSTM_Net(embedding, embedding_dim=250, hidden_dim=150, num_layers=1, dropout=0.5, fix_embedding=fix_embedding)
+    model = LSTM_Net(embedding, embedding_dim=embedding_dim, hidden_dim=hidden_dim, num_layers=num_layers, dropout=dropout, fix_embedding=fix_embedding)
     model = model.to(device) # device為 "cuda"，model 使用 GPU 來訓練（餵進去的 inputs 也需要是 cuda tensor）
 
     # 把 data 分為 training data 跟 validation data（將一部份 training data 拿去當作 validation data）
@@ -58,12 +65,12 @@ def main():
     train_loader = torch.utils.data.DataLoader(dataset = train_dataset,
                                                 batch_size = batch_size,
                                                 shuffle = True,
-                                                num_workers = 8)
+                                                num_workers = num_workers)
 
     val_loader = torch.utils.data.DataLoader(dataset = val_dataset,
                                                 batch_size = batch_size,
                                                 shuffle = False,
-                                                num_workers = 8)
+                                                num_workers = num_workers)
 
     # 開始訓練
     training(batch_size, epoch, lr, model_dir, train_loader, val_loader, model, device)
@@ -79,7 +86,7 @@ def main():
     test_loader = torch.utils.data.DataLoader(dataset = test_dataset,
                                                 batch_size = batch_size,
                                                 shuffle = False,
-                                                num_workers = 8)
+                                                num_workers = num_workers)
     print('\nload model ...')
     model = torch.load(os.path.join(model_dir, 'ckpt.model'))
     outputs = testing(batch_size, test_loader, model, device)
