@@ -10,7 +10,7 @@ from torch import nn
 class LSTM_Net(nn.Module):
 
     def __init__(self, embedding, embedding_dim, hidden_dim, num_layers,
-                 dropout=0.5, fix_embedding=True):
+                 dropout=0.5, fix_embedding=True, bidirectional=False):
         super(LSTM_Net, self).__init__()
         # 製作 embedding layer, 以embedding_matrix為weight製作torch.nn.Embedding, 之後給word index就會回傳embedding vector.
         self.embedding = torch.nn.Embedding(embedding.size(0),embedding.size(1))
@@ -21,9 +21,9 @@ class LSTM_Net(nn.Module):
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
         self.dropout = dropout
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, num_layers=num_layers, batch_first=True)
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim, num_layers=num_layers, batch_first=True, bidirectional=bidirectional)
         self.classifier = nn.Sequential( nn.Dropout(dropout),
-                                         nn.Linear(hidden_dim, 1),
+                                         nn.Linear(2*hidden_dim if bidirectional else hidden_dim, 1),
                                          nn.Sigmoid() )
     def forward(self, inputs):
         inputs = self.embedding(inputs)
@@ -48,6 +48,7 @@ def training(batch_size: int, n_epoch: int, lr: float, model_dir: str,
     criterion = nn.BCELoss() # 定義損失函數，這裡我們使用 binary cross entropy loss
     t_batch, v_batch  = len(train), len(valid)
     optimizer = optim.Adam(model.parameters(), lr=lr) # 將模型的參數給 optimizer，並給予適當的 learning rate
+    scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9, verbose=True)
     total_loss, total_acc, best_acc = 0, 0, 0
 
     for epoch in range(n_epoch):
@@ -92,6 +93,7 @@ def training(batch_size: int, n_epoch: int, lr: float, model_dir: str,
                 print('saving model with acc {:.3f}'.format(total_acc/v_batch*100))
         print('-----------------------------------------------')
         model.train() # 將 model 的模式設為 train，這樣 optimizer 就可以更新 model 的參數（因為剛剛轉成 eval 模式）
+        scheduler.step()
 
 
 # test.py
