@@ -49,7 +49,7 @@ def training(batch_size: int, n_epoch: int, lr: float, model_dir: str,
     t_batch, v_batch  = len(train), len(valid)
     optimizer = optim.Adam(model.parameters(), lr=lr) # 將模型的參數給 optimizer，並給予適當的 learning rate
     scheduler = optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9, verbose=True)
-    total_loss, total_acc, best_acc = 0, 0, 0
+    total_loss, total_acc, best_acc, early_stop = 0, 0, 0, 0
 
     for epoch in range(n_epoch):
         total_loss, total_acc = 0, 0
@@ -91,6 +91,12 @@ def training(batch_size: int, n_epoch: int, lr: float, model_dir: str,
                 #torch.save(model, "{}/val_acc_{:.3f}.model".format(model_dir,total_acc/v_batch*100))
                 torch.save(model, "{}/ckpt.model".format(model_dir))
                 print('saving model with acc {:.3f}'.format(total_acc/v_batch*100))
+                early_stop = 0
+            else:
+                early_stop += 1
+            if early_stop > 2:
+                print(f'Early stopping with acc {best_acc:.3f}!')
+                break
         print('-----------------------------------------------')
         model.train() # 將 model 的模式設為 train，這樣 optimizer 就可以更新 model 的參數（因為剛剛轉成 eval 模式）
         scheduler.step()
