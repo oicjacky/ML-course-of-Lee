@@ -9,7 +9,7 @@ from torch import nn
 from utils import (TRAIN_DATA_PATH, TRAIN_NOLABEL_DATA_PATH, TEST_DATA_PATH, MODEL_CONFIG, PREDICTION,
                     evaluation, load_training_data, load_testing_data)
 from preprocess import Preprocess, TwitterDataset
-from model import LSTM_Net, training, testing
+from model import LSTM_Net
 
 
 def training(batch_size: int, n_epoch: int, lr: float, model_dir: str,
