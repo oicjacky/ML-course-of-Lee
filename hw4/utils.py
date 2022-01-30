@@ -59,7 +59,7 @@ MODEL_CONFIG = dict(
     epoch = config.getint('Model', 'epoch'),
     lr = config.getfloat('Model', 'lr'),
 )
-    
+PREDICTION = config.get('File', 'prediction')
 
 
 if __name__ == '__main__':

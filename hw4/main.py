@@ -3,13 +3,8 @@ Train and Test the model.
 '''
 import os
 import torch
-import argparse
-import numpy as np
 import pandas as pd
-from torch import nn
-from gensim.models import word2vec
-from sklearn.model_selection import train_test_split
-from utils import (TRAIN_DATA_PATH, TRAIN_NOLABEL_DATA_PATH, TEST_DATA_PATH, MODEL_CONFIG, 
+from utils import (TRAIN_DATA_PATH, TRAIN_NOLABEL_DATA_PATH, TEST_DATA_PATH, MODEL_CONFIG, PREDICTION,
                     load_training_data, load_testing_data)
 from preprocess import Preprocess, TwitterDataset
 from model import LSTM_Net, training, testing
@@ -94,13 +89,8 @@ def main():
     # 寫到 csv 檔案供上傳 Kaggle
     tmp = pd.DataFrame({"id":[str(i) for i in range(len(test_x))],"label":outputs})
     print("save csv ...")
-    tmp.to_csv('predict.csv', index=False)
+    tmp.to_csv(PREDICTION, index=False)
     print("Finish Predicting")
-
-    # 以下是使用 command line 上傳到 Kaggle 的方式
-    # 需要先 pip install kaggle、Create API Token，詳細請看 https://github.com/Kaggle/kaggle-api 以及 https://www.kaggle.com/code1110/how-to-submit-from-google-colab
-    # kaggle competitions submit [competition-name] -f [csv file path]] -m [message]
-    # e.g., kaggle competitions submit ml-2020spring-hw4 -f output/predict.csv -m "......"
 
 
 if __name__ == "__main__":
