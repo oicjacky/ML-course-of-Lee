@@ -169,7 +169,7 @@ def main():
                                                 shuffle = False,
                                                 num_workers = num_workers)
     print('\nload model ...')
-    if not torch.cuda.is_available():
+    if torch.cuda.is_available():
         model = torch.load(os.path.join(model_dir, 'ckpt.model'))
     else:
         model = torch.load(os.path.join(model_dir, 'ckpt_cpu.model'))
