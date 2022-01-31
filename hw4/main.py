@@ -64,7 +64,7 @@ def training(batch_size: int, n_epoch: int, lr: float, model_dir: str,
                 # 如果 validation 的結果優於之前所有的結果，就把當下的模型存下來以備之後做預測時使用
                 best_acc = total_acc
                 #torch.save(model, "{}/val_acc_{:.3f}.model".format(model_dir,total_acc/v_batch*100))
-                if not torch.cuda.is_available():
+                if torch.cuda.is_available():
                     torch.save(model, "{}/ckpt.model".format(model_dir))
                 else:
                     torch.save(model, "{}/ckpt_cpu.model".format(model_dir))
@@ -131,7 +131,8 @@ def main():
     y = preprocess.labels_to_tensor(y)
 
     # 製作一個 model 的對象
-    model = LSTM_Net(embedding, embedding_dim=embedding_dim, hidden_dim=hidden_dim, num_layers=num_layers, dropout=dropout, fix_embedding=fix_embedding)
+    model = LSTM_Net(embedding, embedding_dim=embedding_dim, hidden_dim=hidden_dim, num_layers=num_layers,
+                     dropout=dropout, fix_embedding=fix_embedding, bidirectional=True, concate=True)
     model = model.to(device) # device為 "cuda"，model 使用 GPU 來訓練（餵進去的 inputs 也需要是 cuda tensor）
 
     # 把 data 分為 training data 跟 validation data（將一部份 training data 拿去當作 validation data）
