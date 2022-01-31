@@ -1,9 +1,7 @@
 import configparser
 import torch
 import numpy as np
-# import pandas as pd
-# import torch.optim as optim
-# import torch.nn.functional as F
+
 
 def load_training_data(path = "training_label.txt"):
     # 把 training 時需要的 data 讀進來
@@ -43,7 +41,11 @@ def evaluation(outputs, labels):
 
 
 config = configparser.ConfigParser()
-config.read(r'./config.ini')
+#NOTE: this is a quick fix for reading different config files.
+if torch.cuda.is_available():
+    config.read(r'./config.ini')
+else:
+    config.read(r'./config_cpu.ini')
 TRAIN_DATA_PATH = config.get('Data', 'TRAIN_DATA_PATH')
 TRAIN_NOLABEL_DATA_PATH = config.get('Data', 'TRAIN_NOLABEL_DATA_PATH')
 TEST_DATA_PATH = config.get('Data', 'TEST_DATA_PATH')
@@ -64,26 +66,6 @@ PREDICTION = config.get('File', 'prediction')
 
 if __name__ == '__main__':
     
-    # with open(TRAIN_DATA_PATH, 'r', encoding= 'utf-8') as file:
-    #     lines = file.readlines()
-    #     func = lambda x: x.strip("\n").split(" ")
-    #     lines = list(map(func, lines))
-    #     x = [line[2:] for line in lines]
-    #     y = [line[0] for line in lines]
-        
-    #     print(lines[0:100])
-    #     print(x[0:100])
-    #     print(y[0:100])
-
-    
-    # with open(TEST_DATA_PATH, 'r', encoding= 'utf-8') as file:
-    #     lines = file.readlines()
-    #     func = lambda x: ''.join(x.strip("\n").split(",")[1:]).strip()
-    #     lines = list(map(func, lines))[1:]
-    #     lines = list(map(lambda x: x.split(' '), lines))
-    #     print(lines[0:100])
-
-
     random_number = np.random.randint(10000)
     print('Randomly choose a data, index: ', random_number)
     print(load_training_data(TRAIN_DATA_PATH)[0][random_number], load_training_data(TRAIN_DATA_PATH)[1][random_number])

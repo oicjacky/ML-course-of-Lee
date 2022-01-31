@@ -1,9 +1,7 @@
-# preprocess.py
-# 這個 block 用來做 data 的預處理
 import os, pdb
 import torch
-# from torch import nn
 from gensim.models import Word2Vec
+
 
 class Preprocess():
     '''
@@ -65,6 +63,7 @@ class Preprocess():
         # 將每個句子變成一樣的長度
         if len(sentence) > self.sen_len:
             sentence = sentence[:self.sen_len]
+            # import pdb; pdb.set_trace()
         else:
             pad_len = self.sen_len - len(sentence)
             for _ in range(pad_len):
