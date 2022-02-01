@@ -1,6 +1,7 @@
-# w2v.py
-# 這個 block 是用來訓練 word to vector 的 word embedding
-# 注意！這個 block 在訓練 word to vector 時是用 cpu，可能要花到 10 分鐘以上
+''' [Word2Vec Model](https://radimrehurek.com/gensim/auto_examples/tutorials/run_word2vec.html#sphx-glr-auto-examples-tutorials-run-word2vec-py)
+用來訓練 word to vector 的 word embedding model.
+在訓練 word to vector 時是用 cpu，可能要花到 10 分鐘以上.
+'''
 import os
 import numpy as np
 import pandas as pd
