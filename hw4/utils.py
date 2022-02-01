@@ -1,10 +1,11 @@
 import configparser
 import torch
 import numpy as np
+from gensim.utils import simple_preprocess
+from typing import Tuple, Union, List
 
 
-def load_training_data(path = "training_label.txt"):
-    # 把 training 時需要的 data 讀進來
+def load_training_data(path = "training_label.txt") -> Union[Tuple[List,List], List]:
     # 如果是 'training_label.txt'，需要讀取 label，如果是 'training_nolabel.txt'，不需要讀取 label
     if 'training_label' in path:
         with open(path, 'r', encoding= 'utf-8') as f:
@@ -20,8 +21,22 @@ def load_training_data(path = "training_label.txt"):
         return x
 
 
-def load_testing_data(path = 'testing_data'):
-    # 把 testing 時需要的 data 讀進來
+def load_training_with_simple_preprocess(path) -> Union[Tuple[List,List], List]:
+    ''' Use `simple_preprocess` into `load_training_data` '''
+    if 'training_label' in path:
+        with open(path, 'r', encoding= 'utf-8') as f:
+            lines = f.readlines()
+        x = [simple_preprocess(line[2:]) for line in lines]
+        y = [line[0] for line in lines]
+        return x, y
+    else:
+        with open(path, 'r', encoding= 'utf-8') as f:
+            lines = f.readlines()
+            x = [simple_preprocess(line) for line in lines]
+        return x
+
+
+def load_testing_data(path = 'testing_data.txt') -> List:
     with open(path, 'r', encoding= 'utf-8') as f:
         lines = f.readlines()
         X = ["".join(line.strip('\n').split(",")[1:]).strip() for line in lines[1:]]
