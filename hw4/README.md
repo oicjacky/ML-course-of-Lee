@@ -35,12 +35,13 @@ Modified the template code of HW4 colab notebook, and organized the code structu
     - learning rate: 0.001 with exponential decay rate 0.9
     - epoch: 10 with early stopping rule, the count of no-increasing accuracy greater than 2
 
-    |Train  |Validation                                         |Test(private) |Test(public) |
-    | ---   |---                                                |---           |---          |
-    |0.89026|0.82585                                            |0.82588       |0.82581      |<!-- concate (min, max, mean) of LSTM's hidden states  -->
-    | ---   |strong baseline                                    |0.82011       |0.82171      |
-    | ---   |simple baseline                                    |0.76917       |0.76978      |
-<!--|0.86807|0.82290                                            |0.82534       |0.82496      | only concate mean of LSTM's hidden states  -->
+    |Train  |Validation      |Test(private) |Test(public) |
+    | ---   |---             |---           |---          |
+    |0.88902|0.82535         |0.82509       |0.82636      |<!-- concate (min, max, mean) of LSTM's hidden states  -->
+    | ---   |strong baseline |0.82011       |0.82171      |
+    | ---   |simple baseline |0.76917       |0.76978      |
+<!--|0.89026|0.82585         |0.82588       |0.82581      |the same but a little worse, concate (min, max, mean) of LSTM's hidden states  -->
+<!--|0.86807|0.82290         |0.82534       |0.82496      | only concate mean of LSTM's hidden states  -->
 <img src="..\images\hw4_pic02.PNG" style="vertical-align:middle; margin:0px 35px" width="80%" >
     
 
@@ -63,9 +64,57 @@ Modified the template code of HW4 colab notebook, and organized the code structu
 "today is hot, but it is a good day" with probabilty 0.43803 -->
 
 - (1%) 請敘述你如何 improve performance（preprocess、embedding、架構等等），並解釋為何這些做法可以使模型進步，並列出準確率與 improve 前的差異。（semi-supervised 的部分請在下題回答）
+
+    1. **preprocess、embedding**:
+        主要調整輸入句子長度(length of sentence=30)和`gensim.models.Word2Vec`的參數，包含:
+        以Skip-gram方式訓練(sg=1)，詞向量維度(vector_size=250)，訓練次數(epoch=10)，其他如window=5, min_count=5都為default value。
+
+        |Model      |Test(private) |Test(public) |
+        |---        |---           |---          |
+        |sen_len=20 |0.80669       |0.80585      |
+        |sen_len=30 |0.81909       |0.82067      |
+        Other parameters: embedding_dim = 250, hidden_dim = 150, bidirectional=False, num_layers = 1, dropout = 0.5, batch_size = 32, epoch = 10, lr = 0.001
+
+    2. **RNN (LSTM)**:
+        使用多層`torch.nn.LSTM`並提高hidden state dimension，以捕捉句子前後語氣關係。
+        另外，亦使用bidirectional LSTM方式讓模型以前後方向讀取句子(hidden_size=150, num_layers=2, bidirectional=True)。
+        最後LSTM的output再過一層Dropout
+
+        |Model                                          |Test(private) |Test(public) |
+        |---                                            |---           |---          |
+        |bidirectional=False, num_layers=1, dropout=0.5 |0.81909       |0.82067      |
+        |bidirectional=True, num_layers=2, dropout=0.3  |0.82135       |0.82281      |
+        Other parameters: embedding_dim = 250, hidden_dim = 150, batch_size = 32, epoch = 10, lr = 0.001, sen_len=30
+
+        
+    3. **架構**:
+        一般RNN是取用**最後一層hidden state的output(它代表經萃取word embedding後的產物)**，再過一層linear+sigmoid layer，然後output probability。
+        這裡將**所有hidden states(每個時間點)**，進行min, max, mean後組合起來。
+        ```python
+        # model.py line 43-51
+        inputs = self.embedding(inputs)
+        x, _ = self.lstm(inputs, None)
+        if self.concate:
+            x = torch.cat([x.min(dim=1).values , x.max(dim=1).values , x.mean(dim=1)] , dim=1)
+        else:
+            x = x[:, -1, :] 
+        x = self.classifier(x)
+        ```
+        
+        此外，使用`torch.optim.lr_scheduler.ExponentialLR` with gamma=0.9調整learning rate。
+
+        |Model                              |Test(private) |Test(public) |
+        |---                                |---           |---          |
+        |concate=False, ExponentialLR=False |0.82135       |0.82281      |
+        |concate=True, ExponentialLR=True   |0.82509       |0.82636      |
+        Other parameters: embedding_dim = 250, hidden_dim = 150, batch_size = 32, epoch = 10, lr = 0.001, sen_len=30, bidirectional=True, num_layers=2, dropout=0.3
+
+
+    *Reference:*
+    1. [*Word2Vec Model官方介紹參數*](https://radimrehurek.com/gensim/auto_examples/tutorials/run_word2vec.html#sphx-glr-auto-examples-tutorials-run-word2vec-py)
+    2. [*Word2Vec的簡易教學與參數調整指南*](https://www.kaggle.com/jerrykuo7727/word2vec)
+    
+
 - (2%) 請描述你的semi-supervised方法是如何標記label，並比較有無semi-supervised training對準確率的影響並試著探討原因（因為 semi-supervise learning 在 labeled training data 數量較少時，比較能夠發揮作用，所以在實作本題時，建議把有 label 的training data從 20 萬筆減少到 2 萬筆以下，在這樣的實驗設定下，比較容易觀察到semi-supervise learning所帶來的幫助）
 
-
-
-
-[Word2Vec的簡易教學與參數調整指南](https://www.kaggle.com/jerrykuo7727/word2vec)
+    **Self-training**
