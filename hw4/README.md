@@ -40,9 +40,9 @@ Modified the template code of HW4 colab notebook, and organized the code structu
     |0.88902|0.82535         |0.82509       |0.82636      |<!-- concate (min, max, mean) of LSTM's hidden states  -->
     | ---   |strong baseline |0.82011       |0.82171      |
     | ---   |simple baseline |0.76917       |0.76978      |
+    <img src="..\images\hw4_pic03.PNG" style="vertical-align:middle; margin:0px 30px" width="80%" >
 <!--|0.89026|0.82585         |0.82588       |0.82581      |the same but a little worse, concate (min, max, mean) of LSTM's hidden states  -->
 <!--|0.86807|0.82290         |0.82534       |0.82496      | only concate mean of LSTM's hidden states  -->
-<img src="..\images\hw4_pic02.PNG" style="vertical-align:middle; margin:0px 35px" width="80%" >
     
 
 - (2%) 請比較 BOW + DNN 與 RNN 兩種不同 model 對於 "today is a good day, but it is hot" 與 "today is hot, but it is a good day" 這兩句的分數 (過 Sigmoid 後的數值)，並討論造成差異的原因。 
