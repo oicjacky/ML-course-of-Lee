@@ -8,8 +8,8 @@ import torch.optim as optim
 from torch import nn
 from utils import (TRAIN_DATA_PATH, TRAIN_NOLABEL_DATA_PATH, TEST_DATA_PATH, MODEL_CONFIG, PREDICTION,
                     evaluation, load_training_data, load_testing_data)
-from preprocess import Preprocess, TwitterDataset
-from model import LSTM_Net
+from preprocess import Preprocess, TwitterDataset, BagOfWord
+from model import LSTM_Net, DNN
 
 
 def training(batch_size: int, n_epoch: int, lr: float, model_dir: str,
@@ -73,7 +73,7 @@ def training(batch_size: int, n_epoch: int, lr: float, model_dir: str,
             else:
                 early_stop += 1
             if early_stop > 2:
-                print(f'Early stopping with acc {best_acc:.3f}!')
+                print(f'Early stopping with acc {best_acc/v_batch*100:.3f}!')
                 break
         print('-----------------------------------------------')
         model.train() # 將 model 的模式設為 train，這樣 optimizer 就可以更新 model 的參數（因為剛剛轉成 eval 模式）
@@ -182,6 +182,81 @@ def main():
     print("Finish Predicting")
 
 
+def main_BOW():
+    # 通過 torch.cuda.is_available() 的回傳值進行判斷是否有使用 GPU 的環境，如果有的話 device 就設為 "cuda"，沒有的話就設為 "cpu"
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # 處理好各個 data 的路徑
+    train_with_label = TRAIN_DATA_PATH
+    train_no_label = TRAIN_NOLABEL_DATA_PATH
+    testing_data = TEST_DATA_PATH
+    w2v_path = MODEL_CONFIG['w2v_path'] # 處理 word to vec model 的路徑
+
+    # 定義句子長度、要不要固定 embedding、batch 大小、要訓練幾個 epoch、learning rate 的值、model 的資料夾路徑
+    sen_len = MODEL_CONFIG['sen_len']
+    batch_size = MODEL_CONFIG['batch_size']
+    epoch = MODEL_CONFIG['epoch']
+    lr = MODEL_CONFIG['lr']
+    num_workers = 2
+
+    # model_dir = os.path.join(path_prefix, 'model/') # model directory for checkpoint model
+    model_dir = r'.' # model directory for checkpoint model
+
+    print("loading data ...") # 把 'training_label.txt' 跟 'training_nolabel.txt' 讀進來
+    train_x, y = load_training_data(train_with_label)
+    train_x_no_label = load_training_data(train_no_label)
+
+    # 對 input 跟 labels 做預處理
+    train_x, y = train_x[:5000], y[:5000]
+    preprocess = BagOfWord(train_x)
+    input_dim = len(preprocess.vocab)
+    train_x = preprocess.sentence_word2idx()
+    y = preprocess.labels_to_tensor(y)
+    assert train_x.size(1) == input_dim, "Dimension of data and network input are not match!"
+
+    # 製作一個 model 的對象
+    model = DNN(input_dim)
+    model = model.to(device) # device為 "cuda"，model 使用 GPU 來訓練（餵進去的 inputs 也需要是 cuda tensor）
+
+    # 把 data 分為 training data 跟 validation data（將一部份 training data 拿去當作 validation data）
+    X_train, X_val, y_train, y_val = train_x[:4000], train_x[4000:], y[:4000], y[4000:]
+
+    # 把 data 做成 dataset 供 dataloader 取用
+    train_dataset = TwitterDataset(X=X_train, y=y_train)
+    val_dataset = TwitterDataset(X=X_val, y=y_val)
+
+    # 把 data 轉成 batch of tensors
+    train_loader = torch.utils.data.DataLoader(dataset = train_dataset,
+                                                batch_size = batch_size,
+                                                shuffle = True,
+                                                num_workers = num_workers)
+
+    val_loader = torch.utils.data.DataLoader(dataset = val_dataset,
+                                                batch_size = batch_size,
+                                                shuffle = False,
+                                                num_workers = num_workers)
+
+    # 開始訓練
+    training(batch_size, epoch, lr, model_dir, train_loader, val_loader, model, device)
+    print('Complete training!')
+
+    #NOTE: Bag of Word
+    model = torch.load(os.path.join('.', 'ckpt_dnn.model'))
+    model.eval()
+    sentences = ["today is a good day, but it is hot".split(), "today is hot, but it is a good day".split()]
+    sentences = [ [ word.strip(',') for word in sen] for sen in sentences]
+    for sen in sentences:
+        bow_vector = torch.zeros((len(preprocess.vocab), 1), dtype=torch.int8)
+        for id, val in preprocess.vocab.doc2bow(sen):
+            bow_vector[id] = val
+        outputs = model(bow_vector.T.to('cuda'))
+        outputs = outputs.squeeze()
+        print(sen, 'with probabilty', outputs.item())
+        import pdb; pdb.set_trace()
+    print('Done')
+
+
 if __name__ == "__main__":
 
     main()
+    #main_BOW()

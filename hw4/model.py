@@ -50,3 +50,22 @@ class LSTM_Net(nn.Module):
             x = x[:, -1, :] 
         x = self.classifier(x)
         return x
+
+
+class DNN(nn.Module):
+
+    def __init__(self, input_dim):
+        super().__init__()
+        self.dnn = nn.Sequential(
+            nn.Linear(input_dim, 1024, bias=True),
+            nn.ReLU(),
+            nn.Linear(1024, 512, bias=True),
+            nn.ReLU(),
+            nn.Linear(512, 256, bias=True),
+            nn.ReLU(),
+            nn.Linear(256, 1, bias=True),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, inputs):
+        return self.dnn(inputs.float())
