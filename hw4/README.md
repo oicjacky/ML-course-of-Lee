@@ -44,7 +44,24 @@ Modified the template code of HW4 colab notebook, and organized the code structu
 <img src="..\images\hw4_pic02.PNG" style="vertical-align:middle; margin:0px 35px" width="80%" >
     
 
-- (2%) 請比較 BOW + DNN 與 RNN 兩種不同 model 對於 "today is a good day, but it is hot" 與 "today is hot, but it is a good day" 這兩句的分數 (過 softmax 後的數值)，並討論造成差異的原因。 
+- (2%) 請比較 BOW + DNN 與 RNN 兩種不同 model 對於 "today is a good day, but it is hot" 與 "today is hot, but it is a good day" 這兩句的分數 (過 Sigmoid 後的數值)，並討論造成差異的原因。 
+
+    |Sentence                            |BOW+DNN |RNN (LSTM)|
+    |------------------------------------|---     |---       |
+    |"today is a good day, but it is hot"|0.42266 |0.22814   |
+    |"today is hot, but it is a good day"|0.42266 |0.97169   |
+
+    根據上表，RNN模型將"today is a good day, but it is hot"判斷為負面，而"today is hot, but it is a good day"則為正面。
+    然而，使用BOW + DNN兩者機率都是0.42266，代表它無法有效分辨這兩句的差異(因為兩句的bag of word representation一樣)。
+    此外，有個tricky是: ","是否放入bag of word? 如果放入，則"day,"和"data"與"hot"和"hot,"的差異，將會使BOW+DNN結果不同(有放入情況下分別為0.56966與0.43803，恰和RNN判斷相反)。
+    
+<!-- # RNN
+"today is a good day, but it is hot" with probabilty 0.22814
+"today is hot, but it is a good day" with probabilty 0.97169
+# BOW
+"today is a good day, but it is hot" with probabilty 0.56966
+"today is hot, but it is a good day" with probabilty 0.43803 -->
+
 - (1%) 請敘述你如何 improve performance（preprocess、embedding、架構等等），並解釋為何這些做法可以使模型進步，並列出準確率與 improve 前的差異。（semi-supervised 的部分請在下題回答）
 - (2%) 請描述你的semi-supervised方法是如何標記label，並比較有無semi-supervised training對準確率的影響並試著探討原因（因為 semi-supervise learning 在 labeled training data 數量較少時，比較能夠發揮作用，所以在實作本題時，建議把有 label 的training data從 20 萬筆減少到 2 萬筆以下，在這樣的實驗設定下，比較容易觀察到semi-supervise learning所帶來的幫助）
 
