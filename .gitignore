@@ -1,3 +1,6 @@
+# trained model
+*.model
+
 # kernel.json
 share\jupyter\kernels\python3\kernel.json
 
