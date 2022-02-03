@@ -40,6 +40,7 @@ Modified the template code of HW4 colab notebook, and organized the code structu
     |0.88902|0.82535         |0.82509       |0.82636      |<!-- concate (min, max, mean) of LSTM's hidden states  -->
     | ---   |strong baseline |0.82011       |0.82171      |
     | ---   |simple baseline |0.76917       |0.76978      |
+    
     <img src="..\images\hw4_pic03.PNG" style="vertical-align:middle; margin:0px 30px" width="80%" >
 <!--|0.89026|0.82585         |0.82588       |0.82581      |the same but a little worse, concate (min, max, mean) of LSTM's hidden states  -->
 <!--|0.86807|0.82290         |0.82534       |0.82496      | only concate mean of LSTM's hidden states  -->
@@ -109,11 +110,10 @@ Modified the template code of HW4 colab notebook, and organized the code structu
         |concate=True, ExponentialLR=True   |0.82509       |0.82636      |
         Other parameters: embedding_dim = 250, hidden_dim = 150, batch_size = 32, epoch = 10, lr = 0.001, sen_len=30, bidirectional=True, num_layers=2, dropout=0.3
 
-
     *Reference:*
     1. [*Word2Vec Model官方介紹參數*](https://radimrehurek.com/gensim/auto_examples/tutorials/run_word2vec.html#sphx-glr-auto-examples-tutorials-run-word2vec-py)
     2. [*Word2Vec的簡易教學與參數調整指南*](https://www.kaggle.com/jerrykuo7727/word2vec)
-    
+    3. [*自然語言處理入門- Word2vec小實作*](https://medium.com/pyladies-taiwan/%E8%87%AA%E7%84%B6%E8%AA%9E%E8%A8%80%E8%99%95%E7%90%86%E5%85%A5%E9%96%80-word2vec%E5%B0%8F%E5%AF%A6%E4%BD%9C-f8832d9677c8)
 
 - (2%) 請描述你的semi-supervised方法是如何標記label，並比較有無semi-supervised training對準確率的影響並試著探討原因（因為 semi-supervise learning 在 labeled training data 數量較少時，比較能夠發揮作用，所以在實作本題時，建議把有 label 的training data從 20 萬筆減少到 2 萬筆以下，在這樣的實驗設定下，比較容易觀察到semi-supervise learning所帶來的幫助）
 
