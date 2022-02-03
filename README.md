@@ -1,3 +1,8 @@
+<!-- TODO
+- More description in start_pytorch of pytorch introduction
+- Add ObjectDetection
+- Add ImageNetAPP
+ -->
 # Machine Learning 2020 Spring, Hung-yi Lee
 
 [Syllabus](http://speech.ee.ntu.edu.tw/~tlkagk/courses_ML20.html)
@@ -17,6 +22,7 @@
     torchaudio==0.7.2
     torchvision==0.8.2+cu110
     ```
+- More detail in [`requirement.txt`](https://github.com/oicjacky/ML-course-of-Lee/blob/main/requirement.txt)
 
 ## Homework 2
 
