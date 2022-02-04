@@ -8,8 +8,8 @@ from torch.nn import CrossEntropyLoss
 def train_loop(train_loader: DataLoader, model: Classifier,
                loss: CrossEntropyLoss, optimizer: Optimizer,
                train_acc: float, train_loss: float):
-    size = len(train_loader.dataset)
-    for batch_index, data in enumerate(train_loader):
+    count, size = 0, len(train_loader.dataset)
+    for data in train_loader:
         train_pred = model(data[0].cuda()) # 利用 model 得到預測的機率分佈 這邊實際上就是去呼叫 model 的 forward 函數
         batch_loss = loss(train_pred, data[1].cuda()) # 計算 loss （注意 prediction 跟 label 必須同時在 CPU 或是 GPU 上）
         
@@ -19,8 +19,7 @@ def train_loop(train_loader: DataLoader, model: Classifier,
         
         train_acc += np.sum(np.argmax(train_pred.cpu().data.numpy(), axis=1) == data[1].numpy())
         train_loss += batch_loss.item()
-        # if batch_index % 100 == 0:
-        _loss, current = batch_loss.item(), batch_index * len(data[1])
-        print(f"loss: {_loss:>7f}  [{current:>5d}/{size:>5d}]", end='\r')
+        count += len(data[1])
+        print(f"loss: {train_loss/count:>7f}  [{count:>5d}/{size:>5d}]", end='\r')
     print()
     return train_acc, train_loss
