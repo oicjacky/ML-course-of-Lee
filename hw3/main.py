@@ -71,6 +71,7 @@ if __name__ == "__main__":
         train_loss = 0.0
         val_acc = 0.0
         val_loss = 0.0
+        best_acc = 0
 
         print("[TRAIN]")
         model.train() # 確保 model 是在 train model (開啟 Dropout 等...
@@ -82,8 +83,16 @@ if __name__ == "__main__":
         #將結果 print 出來
         print('[%03d/%03d] %2.2f sec(s) Train Acc: %3.6f Loss: %3.6f | Val Acc: %3.6f loss: %3.6f' % \
             (epoch + 1, EPOCH, time.time()-epoch_start_time, \
-             train_acc/train_set.__len__(), train_loss/train_set.__len__(), \
-             val_acc/val_set.__len__(), val_loss/val_set.__len__()))
+             train_acc/len(train_set), train_loss/len(train_set), \
+             val_acc/len(val_set), val_loss/len(val_set)))
+        if val_acc/len(val_set) > best_acc:
+            torch.save(model, './ckpt.model')
+            print('saving model with acc {:.3f}'.format(val_acc/len(val_set)*100))
+            early_stop = 0
+        else:
+            early_stop += 1
+        if early_stop > 2:
+                print(f'Early stopping with acc {val_acc/len(val_set)*100:.3f}!')
         if EXPONENTIAL_LR:
             scheduler.setp()
 
@@ -106,20 +115,3 @@ if __name__ == "__main__":
             f.write('{},{}\n'.format(i, y))
 
     print("Done")
-    # try:
-    # setting device on GPU if available, else CPU
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # print('Using device:', device)
-    # print()
-    # ---------------------------------
-    # ---- for epoch ... MAIN CODE ---- 
-    # ----         PUT HERE        ---- 
-    # ---------------------------------
-    # except Exception as err:
-    #     print(err)
-    #     #Additional Info when using cuda
-    #     if device.type == 'cuda':
-    #         print(torch.cuda.get_device_name(0))
-    #         print('Memory Usage:')
-    #         print('Allocated:', round(torch.cuda.memory_allocated(0)/1024**3,1), 'GB')
-    #         print('Cached:   ', round(torch.cuda.memory_reserved(0)/1024**3,1), 'GB')
