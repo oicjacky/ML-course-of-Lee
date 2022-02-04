@@ -11,6 +11,7 @@ import configparser
 import os
 import time
 import torch
+import numpy as np
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     
     for epoch in range(EPOCH):
         print("[EPOCH] Now is {}".format(epoch))
-        if epoch > 5:
+        if epoch > 1:
             print("Break manually.")
             break
         epoch_start_time = time.time()
@@ -72,18 +73,32 @@ if __name__ == "__main__":
         train_acc, train_loss = train_loop(train_loader, model, loss, optimizer, train_acc, train_loss)
         print("[VALIDATE]")
         model.eval()
-        val_acc, val_loss, prediction = test_loop(val_loader, model, loss, val_acc, val_loss)
+        val_acc, val_loss = test_loop(val_loader, model, loss, val_acc, val_loss)
 
         #將結果 print 出來
         print('[%03d/%03d] %2.2f sec(s) Train Acc: %3.6f Loss: %3.6f | Val Acc: %3.6f loss: %3.6f' % \
             (epoch + 1, EPOCH, time.time()-epoch_start_time, \
-            train_acc/train_set.__len__(), train_loss/train_set.__len__(), val_acc/val_set.__len__(), val_loss/val_set.__len__()))
+             train_acc/train_set.__len__(), train_loss/train_set.__len__(), \
+             val_acc/val_set.__len__(), val_loss/val_set.__len__()))
         
-        #將結果寫入 csv 檔
-        with open(PREDICTION, 'w') as f:
-            f.write('Id,Category\n')
-            for i, y in  enumerate(prediction):
-                f.write('{},{}\n'.format(i, y))
+
+    #TODO: use all train + valid data to re-train a model
+    print("[TEST]")
+    test_set = ImgDataset(test_x, transform=Preprocessor.test_transform)
+    test_loader = DataLoader(test_set, batch_size=BATCH_SIZE, shuffle=False)
+
+    model.eval()
+    prediction = []
+    with torch.no_grad():
+        for i, data in enumerate(test_loader):
+            test_pred = model(data.cuda())
+            test_label = np.argmax(test_pred.cpu().data.numpy(), axis=1)
+            prediction += test_label.tolist()
+    #將結果寫入 csv 檔
+    with open(PREDICTION, 'w') as f:
+        f.write('Id,Category\n')
+        for i, y in  enumerate(prediction):
+            f.write('{},{}\n'.format(i, y))
 
     print("Done")
     # try:

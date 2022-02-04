@@ -19,7 +19,8 @@ def train_loop(train_loader: DataLoader, model: Classifier,
         
         train_acc += np.sum(np.argmax(train_pred.cpu().data.numpy(), axis=1) == data[1].numpy())
         train_loss += batch_loss.item()
-        if batch_index % 100 == 0:
-            _loss, current = batch_loss.item(), batch_index * len(data[1])
-            print(f"loss: {_loss:>7f}  [{current:>5d}/{size:>5d}]")
+        # if batch_index % 100 == 0:
+        _loss, current = batch_loss.item(), batch_index * len(data[1])
+        print(f"loss: {_loss:>7f}  [{current:>5d}/{size:>5d}]", end='\r')
+    print()
     return train_acc, train_loss
