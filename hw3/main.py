@@ -34,6 +34,8 @@ if __name__ == "__main__":
     BATCH_SIZE = config.getint('Model', 'batch_size')  # 128 will lead insufficient memory 
     LEARNING_RATE = config.getfloat('Model', 'learning_rate')
     EPOCH = config.getint('Model', 'epoch')
+    EXPONENTIAL_LR = config.getboolean('Model', 'exponential_lr')
+    EXP_GAMMA = config.getfloat('Model', 'exponential_gamma')
     PREDICTION = config.get('File', 'prediction')
 
     print("[Reading image] using opencv(cv2) read images into np.array")
@@ -56,6 +58,8 @@ if __name__ == "__main__":
     model = Classifier().cuda()
     loss = nn.CrossEntropyLoss() # 因為是 classification task，所以 loss 使用 CrossEntropyLoss
     optimizer = torch.optim.Adam(model.parameters(), lr = LEARNING_RATE) # Adam optimizer
+    if EXPONENTIAL_LR:
+        scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=EXP_GAMMA, verbose=True)
     
     for epoch in range(EPOCH):
         print("[EPOCH] Now is {}".format(epoch))
@@ -80,7 +84,8 @@ if __name__ == "__main__":
             (epoch + 1, EPOCH, time.time()-epoch_start_time, \
              train_acc/train_set.__len__(), train_loss/train_set.__len__(), \
              val_acc/val_set.__len__(), val_loss/val_set.__len__()))
-        
+        if EXPONENTIAL_LR:
+            scheduler.setp()
 
     #TODO: use all train + valid data to re-train a model
     print("[TEST]")
