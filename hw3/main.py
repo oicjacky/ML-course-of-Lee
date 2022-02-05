@@ -44,9 +44,7 @@ if __name__ == "__main__":
     _p = lambda p: os.path.join(DATA_DIR, p)
     train_x, train_y = Preprocessor.readfile(_p("training"), True)
     val_x, val_y = Preprocessor.readfile(_p("validation"), True)
-    test_x = Preprocessor.readfile(_p("testing"), False)
-    print("Size of training data, validation data, testing data = {}, {}, {}".format(
-        len(train_x), len(val_x), len(test_x)))
+    print("Size of training data, validation data = {}, {}".format(len(train_x), len(val_x)))
     
 
     print("[Preprocessing] create dataset and initialize dataloader")
@@ -101,23 +99,4 @@ if __name__ == "__main__":
             scheduler.step()
 
     #TODO: use all train + valid data to re-train a model
-    print("[TEST]")
-    test_set = ImgDataset(test_x, transform=Preprocessor.test_transform)
-    test_loader = DataLoader(test_set, batch_size=BATCH_SIZE, shuffle=False)
-
-    print('loading checkpoint model...')
-    model = torch.load(os.path.join('.', CHECKPOINT_MODEL))
-    model.eval()
-    prediction = []
-    with torch.no_grad():
-        for i, data in enumerate(test_loader):
-            test_pred = model(data.cuda())
-            test_label = np.argmax(test_pred.cpu().data.numpy(), axis=1)
-            prediction += test_label.tolist()
-    #將結果寫入 csv 檔
-    with open(PREDICTION, 'w') as f:
-        f.write('Id,Category\n')
-        for i, y in  enumerate(prediction):
-            f.write('{},{}\n'.format(i, y))
-
     print("Done")
