@@ -37,6 +37,8 @@ if __name__ == "__main__":
     EXPONENTIAL_LR = config.getboolean('Model', 'exponential_lr')
     EXP_GAMMA = config.getfloat('Model', 'exponential_gamma')
     PREDICTION = config.get('File', 'prediction')
+    CHECKPOINT_MODEL = config.get('File', 'checkpoint_model')
+
 
     print("[Reading image] using opencv(cv2) read images into np.array")
     _p = lambda p: os.path.join(DATA_DIR, p)
@@ -56,7 +58,7 @@ if __name__ == "__main__":
     
     print("[Modeling]")
     model = Classifier()
-    #model = VGG16(linear_batch_norm=False, linear_dropout=False, linear_dropout_rate=0.3)
+    #model = VGG16(linear_batch_norm=False, linear_dropout=False, linear_dropout_rate=0.5)
     model.cuda()
     loss = nn.CrossEntropyLoss() # 因為是 classification task，所以 loss 使用 CrossEntropyLoss
     optimizer = torch.optim.Adam(model.parameters(), lr = LEARNING_RATE) # Adam optimizer
@@ -65,9 +67,9 @@ if __name__ == "__main__":
     
     for epoch in range(EPOCH):
         print("[EPOCH] Now is {}".format(epoch))
-        if epoch > 1:
-            print("Break manually.")
-            break
+        # if epoch > 1:
+        #     print("Break manually.")
+        #     break
         epoch_start_time = time.time()
         train_acc = 0.0
         train_loss = 0.0
@@ -88,7 +90,7 @@ if __name__ == "__main__":
              train_acc/len(train_set), train_loss/len(train_set), \
              val_acc/len(val_set), val_loss/len(val_set)))
         if val_acc/len(val_set) > best_acc:
-            torch.save(model, './ckpt.model')
+            torch.save(model, os.path.join('.', CHECKPOINT_MODEL))
             print('saving model with acc {:.3f}'.format(val_acc/len(val_set)*100))
             early_stop = 0
         else:
@@ -104,7 +106,7 @@ if __name__ == "__main__":
     test_loader = DataLoader(test_set, batch_size=BATCH_SIZE, shuffle=False)
 
     print('loading checkpoint model...')
-    model = torch.load('./ckpt.model')
+    model = torch.load(os.path.join('.', CHECKPOINT_MODEL))
     model.eval()
     prediction = []
     with torch.no_grad():
