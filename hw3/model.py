@@ -110,9 +110,9 @@ class VGG16(nn.Module):
             nn.BatchNorm1d(4096) if self.linear_batch_norm else nn.Identity(),
             nn.ReLU(),
             nn.Dropout(self.linear_dropout_rate) if self.linear_dropout else nn.Identity(),
-            
+
             nn.Linear(4096, 1024),
-            nn.BatchNorm1d(4096) if self.linear_batch_norm else nn.Identity(),
+            nn.BatchNorm1d(1024) if self.linear_batch_norm else nn.Identity(),
             nn.ReLU(),
             nn.Dropout(self.linear_dropout_rate) if self.linear_dropout else nn.Identity(),
 
