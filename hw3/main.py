@@ -103,6 +103,8 @@ if __name__ == "__main__":
     test_set = ImgDataset(test_x, transform=Preprocessor.test_transform)
     test_loader = DataLoader(test_set, batch_size=BATCH_SIZE, shuffle=False)
 
+    print('loading checkpoint model...')
+    model = torch.load('./ckpt.model')
     model.eval()
     prediction = []
     with torch.no_grad():
