@@ -16,7 +16,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from preprocess import Preprocessor, ImgDataset
-from model import Classifier
+from model import Classifier, VGG16
 from training import train_loop
 from testing import test_loop
 
@@ -55,7 +55,9 @@ if __name__ == "__main__":
 
     
     print("[Modeling]")
-    model = Classifier().cuda()
+    model = Classifier()
+    #model = VGG16(linear_batch_norm=False, linear_dropout=False, linear_dropout_rate=0.3)
+    model.cuda()
     loss = nn.CrossEntropyLoss() # 因為是 classification task，所以 loss 使用 CrossEntropyLoss
     optimizer = torch.optim.Adam(model.parameters(), lr = LEARNING_RATE) # Adam optimizer
     if EXPONENTIAL_LR:
