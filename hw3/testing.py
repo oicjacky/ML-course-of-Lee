@@ -17,6 +17,6 @@ def test_loop(val_loader: DataLoader, model: Classifier,
             val_acc += np.sum(np.argmax(val_pred.cpu().data.numpy(), axis=1) == data[1].numpy())
             val_loss += batch_loss.item()
             count += len(data[1])
-            print(f"loss: {val_loss/count:>7f}  [{count:>5d}/{size:>5d}]", end='\r')
+            print(f"[{count:>5d}/{size:>5d}] loss: {val_loss/count:>7f} accuracy: {val_acc/count:>7f}", end='\r')
         print()
     return val_acc, val_loss

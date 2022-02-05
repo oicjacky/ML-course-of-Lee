@@ -20,6 +20,6 @@ def train_loop(train_loader: DataLoader, model: Classifier,
         train_acc += np.sum(np.argmax(train_pred.cpu().data.numpy(), axis=1) == data[1].numpy())
         train_loss += batch_loss.item()
         count += len(data[1])
-        print(f"loss: {train_loss/count:>7f}  [{count:>5d}/{size:>5d}]", end='\r')
+        print(f"[{count:>5d}/{size:>5d}] loss: {train_loss/count:>7f} accuracy: {train_acc/count:>7f}", end='\r')
     print()
     return train_acc, train_loss

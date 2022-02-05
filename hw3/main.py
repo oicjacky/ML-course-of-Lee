@@ -94,7 +94,7 @@ if __name__ == "__main__":
         if early_stop > 2:
                 print(f'Early stopping with acc {val_acc/len(val_set)*100:.3f}!')
         if EXPONENTIAL_LR:
-            scheduler.setp()
+            scheduler.step()
 
     #TODO: use all train + valid data to re-train a model
     print("[TEST]")
