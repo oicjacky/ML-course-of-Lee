@@ -11,7 +11,6 @@ import configparser
 import os
 import time
 import torch
-import numpy as np
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
@@ -94,7 +93,7 @@ if __name__ == "__main__":
         else:
             early_stop += 1
         if early_stop > 2:
-                print(f'Early stopping with acc {val_acc/len(val_set)*100:.3f}!')
+            print(f'Early stopping with acc {val_acc/len(val_set)*100:.3f}!')
         if EXPONENTIAL_LR:
             scheduler.step()
 
