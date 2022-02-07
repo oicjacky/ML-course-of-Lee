@@ -89,6 +89,7 @@ if __name__ == "__main__":
         if val_acc/len(val_set) > best_acc:
             torch.save(model, os.path.join('.', CHECKPOINT_MODEL))
             print('saving model with acc {:.3f}'.format(val_acc/len(val_set)*100))
+            best_acc = val_acc/len(val_set)
             early_stop = 0
         else:
             early_stop += 1
