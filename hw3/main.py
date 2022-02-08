@@ -62,17 +62,14 @@ if __name__ == "__main__":
     if EXPONENTIAL_LR:
         scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=EXP_GAMMA, verbose=True)
     
+    best_acc = 0
     for epoch in range(EPOCH):
         print("[EPOCH] Now is {}".format(epoch))
-        # if epoch > 1:
-        #     print("Break manually.")
-        #     break
         epoch_start_time = time.time()
         train_acc = 0.0
         train_loss = 0.0
         val_acc = 0.0
         val_loss = 0.0
-        best_acc = 0
 
         print("[TRAIN]")
         model.train() # 確保 model 是在 train model (開啟 Dropout 等...
