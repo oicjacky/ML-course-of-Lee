@@ -18,6 +18,7 @@ from preprocess import Preprocessor, ImgDataset
 from model import Classifier, VGG16
 from training import train_loop
 from testing import test_loop
+from logger import LOGGER
 
 def main():
     pass
@@ -39,23 +40,24 @@ if __name__ == "__main__":
     CHECKPOINT_MODEL = config.get('File', 'checkpoint_model')
 
 
-    print("[Reading image] using opencv(cv2) read images into np.array")
+    LOGGER.info("[Reading image] using opencv(cv2) read images into np.array")
     _p = lambda p: os.path.join(DATA_DIR, p)
     train_x, train_y = Preprocessor.readfile(_p("training"), True)
     val_x, val_y = Preprocessor.readfile(_p("validation"), True)
-    print("Size of training data, validation data = {}, {}".format(len(train_x), len(val_x)))
+    LOGGER.info("Size of training data, validation data = {}, {}".format(len(train_x), len(val_x)))
     
 
-    print("[Preprocessing] create dataset and initialize dataloader")
+    LOGGER.info("[Preprocessing] create dataset and initialize dataloader")
     train_set = ImgDataset(train_x, train_y, Preprocessor.train_transform)
     val_set = ImgDataset(val_x, val_y, Preprocessor.test_transform)
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
     val_loader = DataLoader(val_set, batch_size=BATCH_SIZE, shuffle=False)
 
     
-    print("[Modeling]")
+    LOGGER.info("[Modeling]")
     model = Classifier()
     #model = VGG16(linear_batch_norm=False, linear_dropout=False, linear_dropout_rate=0.5)
+    #model = torch.load(os.path.join('.', CHECKPOINT_MODEL))
     model.cuda()
     loss = nn.CrossEntropyLoss() # 因為是 classification task，所以 loss 使用 CrossEntropyLoss
     optimizer = torch.optim.Adam(model.parameters(), lr = LEARNING_RATE) # Adam optimizer
@@ -64,36 +66,37 @@ if __name__ == "__main__":
     
     best_acc = 0
     for epoch in range(EPOCH):
-        print("[EPOCH] Now is {}".format(epoch))
+        LOGGER.info("[EPOCH] Now is {}".format(epoch))
         epoch_start_time = time.time()
         train_acc = 0.0
         train_loss = 0.0
         val_acc = 0.0
         val_loss = 0.0
 
-        print("[TRAIN]")
+        LOGGER.info("[TRAIN]")
         model.train() # 確保 model 是在 train model (開啟 Dropout 等...
         train_acc, train_loss = train_loop(train_loader, model, loss, optimizer, train_acc, train_loss)
-        print("[VALIDATE]")
+        LOGGER.info("[VALIDATE]")
         model.eval()
         val_acc, val_loss = test_loop(val_loader, model, loss, val_acc, val_loss)
 
         #將結果 print 出來
-        print('[%03d/%03d] %2.2f sec(s) Train Acc: %3.6f Loss: %3.6f | Val Acc: %3.6f loss: %3.6f' % \
+        LOGGER.info('[%03d/%03d] %2.2f sec(s) Train Acc: %3.6f Loss: %3.6f | Val Acc: %3.6f loss: %3.6f' % \
             (epoch + 1, EPOCH, time.time()-epoch_start_time, \
              train_acc/len(train_set), train_loss/len(train_set), \
              val_acc/len(val_set), val_loss/len(val_set)))
-        if val_acc/len(val_set) > best_acc:
+        if val_acc > best_acc:
             torch.save(model, os.path.join('.', CHECKPOINT_MODEL))
-            print('saving model with acc {:.3f}'.format(val_acc/len(val_set)*100))
-            best_acc = val_acc/len(val_set)
+            LOGGER.info('saving model with acc {:.3f}'.format(val_acc/len(val_set)*100))
+            best_acc = val_acc
             early_stop = 0
         else:
             early_stop += 1
         if early_stop > 2:
-            print(f'Early stopping with acc {val_acc/len(val_set)*100:.3f}!')
+            LOGGER.info(f'Early stopping with acc {val_acc/len(val_set)*100:.3f}!')
+            break
         if EXPONENTIAL_LR:
             scheduler.step()
 
     #TODO: use all train + valid data to re-train a model
-    print("Done")
+    LOGGER.info("Done")
