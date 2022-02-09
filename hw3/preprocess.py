@@ -23,6 +23,7 @@ class Preprocessor:
     test_transform = transforms.Compose([
         transforms.ToPILImage(),                                    
         transforms.ToTensor(),
+        transforms.Normalize(mean=[0.3438, 0.4511, 0.5551], std=[0.2811, 0.2740, 0.2711]), #NOTE: default, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
     ])
 
     @staticmethod
