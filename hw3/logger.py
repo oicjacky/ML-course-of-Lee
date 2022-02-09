@@ -1,3 +1,4 @@
+import configparser
 import time
 import logging
 
@@ -20,7 +21,10 @@ def setup_logger(name, log_file =None, level=logging.INFO):
     logger.addHandler(handler)
     return logger
 
-LOGGER = setup_logger(name="datetime_logger", log_file=f"{time.strftime('%m%dT%H%M')}.log")
+config = configparser.ConfigParser()
+config.read(r'./config.ini')
+log_file = config.get('File', 'log_file')
+LOGGER = setup_logger(name="datetime_logger", log_file=f"{log_file+time.strftime('_%H%M')}.log")
 
 if __name__ == "__main__":
     
