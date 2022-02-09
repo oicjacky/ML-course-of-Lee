@@ -13,11 +13,12 @@ class Preprocessor:
         transforms.ToPILImage(),
         transforms.RandomHorizontalFlip(), # 隨機將圖片水平翻轉
         # transforms.RandomResizedCrop(96), # 隨機擷取約75%圖片區域(96/128)
-        transforms.RandomAffine(degrees=30, translate=(0.1, 0.3), scale=(0.5, 0.75)),
+        transforms.RandomCrop(size=(128, 128)), # 隨機擷取圖片某區域
+        # transforms.RandomAffine(degrees=30, translate=(0.1, 0.3), scale=(0.5, 0.75)),
         transforms.ColorJitter(brightness=0.5, hue=0.3),
-        # transforms.RandomRotation(15), # 隨機旋轉圖片
+        transforms.RandomRotation(30), # 隨機旋轉圖片
         transforms.ToTensor(), # 將圖片轉成 Tensor，並把數值 normalize 到 [0,1] (data normalization)
-        transforms.Normalize(mean=[0.3231, 0.4273, 0.5279], std=[0.2823, 0.2837, 0.2905]), #NOTE: default, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        transforms.Normalize(mean=[0.3438, 0.4511, 0.5551], std=[0.2811, 0.2740, 0.2711]), #NOTE: default, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
     ])
     test_transform = transforms.Compose([
         transforms.ToPILImage(),                                    
