@@ -208,15 +208,40 @@ class VGG16_half(nn.Module):
         return self.fc(out)
 
 
+class DNN(nn.Module):
+    def __init__(self, linear_dropout_rate = 0.5):
+        super(DNN, self).__init__()
+        self.linear_dropout_rate = linear_dropout_rate
+        self.flatten = nn.Flatten()
+        self.fc = nn.Sequential(
+            nn.Linear(3*128*128, 1024),
+            nn.BatchNorm1d(1024),
+            nn.ReLU(),
+            nn.Dropout(self.linear_dropout_rate),
+
+            nn.Linear(1024, 512),
+            nn.BatchNorm1d(512),
+            nn.ReLU(),
+            nn.Dropout(self.linear_dropout_rate),
+            nn.Linear(512, 11)
+        )
+
+    def forward(self, x):
+        out = self.flatten(x)
+        return self.fc(out)
+
+
 if __name__ == "__main__":
     
     model_zoo = {
         'CNN' : Classifier(),
         'vgg16' : VGG16(True, True, 0.5),
         'vgg16_half' : VGG16_half(True, True, 0.5),
+        'DNN' : DNN(0.5),
     }
     for name, model in model_zoo.items():
         print(name, 'has', sum(p.numel() for p in model.parameters()), 'parameters')
     # CNN        has 12833803 parameters
     # vgg16      has 52619851 parameters
     # vgg16_half has 52321503 parameters
+    # DNN        has 50866187 parameters
