@@ -164,16 +164,16 @@ class VGG16_half(nn.Module):
             # nn.ReLU(),
             nn.MaxPool2d(2, 2, 0),      # [256, 16, 16]
 
-            # nn.Conv2d(256, 512, 3, 1, 1), # [512, 16, 16]
-            # nn.BatchNorm2d(512),
-            # nn.ReLU(),
+            nn.Conv2d(256, 512, 3, 1, 1), # [512, 16, 16]
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
             # nn.Conv2d(512, 512, 3, 1, 1), # [512, 16, 16]
             # nn.BatchNorm2d(512),
             # nn.ReLU(),
             # nn.Conv2d(512, 512, 3, 1, 1), # [512, 16, 16]
             # nn.BatchNorm2d(512),
             # nn.ReLU(),
-            # nn.MaxPool2d(2, 2, 0),       # [512, 8, 8]
+            nn.MaxPool2d(2, 2, 0),       # [512, 8, 8]
             
             # nn.Conv2d(512, 512, 3, 1, 1), # [512, 8, 8]
             # nn.BatchNorm2d(512),
@@ -187,17 +187,17 @@ class VGG16_half(nn.Module):
             # nn.MaxPool2d(2, 2, 0),       # [512, 4, 4]
         )
         self.fc = nn.Sequential(
-            nn.Linear(256*16*16, 4096),
-            nn.BatchNorm1d(4096) if self.linear_batch_norm else nn.Identity(),
+            nn.Linear(512*8*8, 1500),
+            nn.BatchNorm1d(1500) if self.linear_batch_norm else nn.Identity(),
             nn.ReLU(),
             nn.Dropout(self.linear_dropout_rate) if self.linear_dropout else nn.Identity(),
 
-            nn.Linear(4096, 1024),
-            nn.BatchNorm1d(1024) if self.linear_batch_norm else nn.Identity(),
+            nn.Linear(1500, 512),
+            nn.BatchNorm1d(512) if self.linear_batch_norm else nn.Identity(),
             nn.ReLU(),
             nn.Dropout(self.linear_dropout_rate) if self.linear_dropout else nn.Identity(),
 
-            nn.Linear(1024, 128),
+            nn.Linear(512, 128),
             nn.ReLU(),
             nn.Linear(128, 11)
         )
@@ -206,3 +206,17 @@ class VGG16_half(nn.Module):
         out = self.cnn(x)
         out = out.view(out.size()[0], -1)
         return self.fc(out)
+
+
+if __name__ == "__main__":
+    
+    model_zoo = {
+        'CNN' : Classifier(),
+        'vgg16' : VGG16(True, True, 0.5),
+        'vgg16_half' : VGG16_half(True, True, 0.5),
+    }
+    for name, model in model_zoo.items():
+        print(name, 'has', sum(p.numel() for p in model.parameters()), 'parameters')
+    # CNN        has 12833803 parameters
+    # vgg16      has 52619851 parameters
+    # vgg16_half has 52321503 parameters
