@@ -60,6 +60,13 @@ Modified the template code of HW3 colab notebook, and organized the code structu
     最後fully connected layer都加上dropout避免overfitting:  
     <img src="..\images\hw3_VGG16.PNG" style="vertical-align:middle; margin:0px 50px" width="40%">
 
+    | Model                                      | Accuracy                            | Train              |
+    | ------------------------------------------ | ----------------------------------- | ------------------ |
+    | VGG16 (linear dropout+batch norm) epoch180 | 0.846728                            | train_acc=0.996616 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
+    | ----- strong baseline -----                | 0.79928 (private), 0.79318 (public) | ---                |                                          |
+    | ----- simple baseline -----                | 0.70788 (private), 0.71727 (public) | ---                |                                          |
+
+
     <!-- *NOTE2:*   -->
     - 一開始，我先設定batch_size=32, learning_rate=0.001, dropout rate=0.5, No exponential learning rate decay  
         其中Data augmentation使用:  
@@ -117,9 +124,11 @@ Modified the template code of HW3 colab notebook, and organized the code structu
     
     - 發現相較於原本`VGG16`(深且瘦)的模型，較淺較胖的`VGG16_half`在overfitting狀況較明顯。  
       雖然training accuracy高，但不論validation或testing都比較差。
-    - TODO: 
-      1. 修改`VGG16_half`的減半方式，目前是直接調整CNN層數，而未調整CNN的kernal size。  
+    - **TODO**: 
+      1. 修改`VGG16_half`的減半方式，目前是直接調整CNN層數，而未調整CNN的kernel size。  
          而在參數量差不多情況下，`VGG16_half`在後面fully connected layer參數是比較多而胖的。  
+         在`VGG`論文中[Very Deep Convolutional Networks for Large-Scale Image Recognition](https://arxiv.org/abs/1409.1556)提到，  
+         它使用多個kernel size比較小的convolution filter，取代原本少量但kernal size較大的filter。
 
 
 3. (1%) 請實作與第一題接近的參數量，簡單的 DNN 模型，同時也說明其模型架構、訓練參數和準確率為何？
@@ -132,7 +141,17 @@ Modified the template code of HW3 colab notebook, and organized the code structu
 
 
 4. (1%) 請說明由 1 ~ 3 題的實驗中你觀察到了什麼？
-    待補  
+    1. 原本`VGG16`的模型架構由13層convolution layers和3層fully connected layers(及5層max pooling layers)組成。  
+       在此架構上加入Batch Normalization和Dropout的處理，提升資料分配集中性(避免Internal Covariate Shift)，避免深層神經網路Gradient vanishing問題，  
+       以及訓練模型overfitting狀況。
+    2. 在參數量接近(皆在5千萬量級)情況下，
+       1. 相較於淺且胖的神經網路，深且瘦的神經網路比較容易得到更好的表現。原因可能為:
+          - 深層神經網路就像將主要任務拆分成多個小任務，每一層都萃取出部分特徵，最後匯聚而成分類重要資訊。
+          - 胖的神經網路容易導致overfitting，試想一個神經網路，它一層的神經元個數與資料數相同，代表每一個神經元就帶一筆資料的資訊。  
+            這時，training可以輕易達到100%準確率，但是testing卻可能異常差，亦即嚴重overfitting。
+       2. 一般的DNN模型在影像分類問題上，無法達到CNN模型的表現。原因主要在於convolution的動作，確實可以  
+          抓取出圖片中的特徵，包含輪廓、顏色、圖像位置等資訊。因此，在影像問題上CNN模型優於DNN模型。
+
 
 5. (1%) 請嘗試 data normalization 及 data augmentation，說明實作方法並且說明實行前後對準確率有什麼樣的影響？
    
@@ -187,4 +206,11 @@ Modified the template code of HW3 colab notebook, and organized the code structu
 
 6. (1%) 觀察答錯的圖片中，哪些 class 彼此間容易用混？[繪出 confusion matrix 分析]
 
-    待補
+    <img src="..\images\food_confusion_mat_1.png" style="vertical-align:middle; margin:0px 50px" width="75%">
+    
+    X軸代表模型判斷類別，Y軸代表真實類別。其中，每一列(row)加總等於1，  
+    代表對角線數值為**正確判斷比例**，而其他數值為"原本為該列類別，**誤判為該行類別**"。
+    - Dairy product準確率70%為最低，有12%被誤判為Dessert，與5%被誤判為Seafood。
+    - Dessert準確率79%，但有5%被誤判為Bread。
+    - Egg準確率78%，有9%被誤判為Bread，與5%被誤判為Dessert。
+    - 其他類別準確率皆至少82%以上，最高為Noodles\Pasta和Soup的95%。
