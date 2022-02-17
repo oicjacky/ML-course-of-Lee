@@ -9,7 +9,7 @@
 
   - [x] [Requirement](#requirement)
   - [ ] [Homework 2](#homework-2)
-  - [ ] [Homework 3](#homework-3)
+  - [x] [Homework 3](#homework-3)
   - [x] [Homework 4](#homework-4)
   - [x] [PyTorch Introduction](#pytorch-introduction)
 
@@ -21,6 +21,10 @@
     torch==1.7.1+cu110
     torchaudio==0.7.2
     torchvision==0.8.2+cu110
+    # On Colab
+    torch==1.10.0+cu111
+    torchaudio==0.10.0+cu111
+    torchvision==0.11.1+cu111
     ```
 - More detail in [`requirement.txt`](https://github.com/oicjacky/ML-course-of-Lee/blob/main/requirement.txt)
 
@@ -44,7 +48,7 @@
 
 ## Homework 3
 
-- [Report HW3 CNN]()
+- [Report HW3 CNN](https://github.com/oicjacky/ML-course-of-Lee/tree/main/hw3)
     
     <u>**Task - Food Classification**</u>
 
