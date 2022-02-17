@@ -6,9 +6,14 @@ Modified the template code of HW3 colab notebook, and organized the code structu
 
 ```markdown
 - preprocess.py
+- model.py
 - training.py
 - testing.py
 - main.py
+- logger.py
+- config.ini
+- submit.py
+- final.py
 ```
 
 ## Questions:
@@ -60,15 +65,15 @@ Modified the template code of HW3 colab notebook, and organized the code structu
     最後fully connected layer都加上dropout避免overfitting:  
     <img src="..\images\hw3_VGG16.PNG" style="vertical-align:middle; margin:0px 50px" width="40%">
 
-    | Model                                      | Accuracy                            | Train              |
-    | ------------------------------------------ | ----------------------------------- | ------------------ |
-    | VGG16 (linear dropout+batch norm) epoch180 | 0.846728                            | train_acc=0.996616 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
-    | ----- strong baseline -----                | 0.79928 (private), 0.79318 (public) | ---                |                                          |
-    | ----- simple baseline -----                | 0.70788 (private), 0.71727 (public) | ---                |                                          |
+    | Model                                      | Accuracy                            | Train    |
+    | ------------------------------------------ | ----------------------------------- | -------- |
+    | VGG16 (linear dropout+batch norm) epoch180 | 0.846728                            | 0.996616 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
+    | ----- strong baseline -----                | 0.79928 (private), 0.79318 (public) | ---      |                                          |
+    | ----- simple baseline -----                | 0.70788 (private), 0.71727 (public) | ---      |                                          |
 
 
     <!-- *NOTE2:*   -->
-    - 一開始，我先設定batch_size=32, learning_rate=0.001, dropout rate=0.5, No exponential learning rate decay  
+    - 一開始，我先設定batch size=32, learning rate=0.001, dropout rate=0.5, No exponential learning rate decay  
         其中Data augmentation使用:  
         ```python
         RandomHorizontalFlip() -> 
@@ -86,7 +91,7 @@ Modified the template code of HW3 colab notebook, and organized the code structu
         | VGG16 (linear dropout+batch norm) epoch80  | 0.701225 | train_acc=0.787046, val_acc=0.685131 | ---                                      | _info_0257.log |
         | VGG16 (linear dropout+batch norm) epoch150 | 0.749627 | train_acc=0.957125, val_acc=0.741983 | ckpt_VGG16_dropout_batchnorm_ep150.model | _info_0257.log |
     
-        此時，`VGG16 (linear dropout+batch norm)`在epocp 180後打開exponential learning rate decay持續訓練:  
+        此時，`VGG16 (linear dropout+batch norm)`在epocp 180後打開exponential learning rate decay(gamma=0.9)持續訓練:  
         | Model                                      | Accuracy | Train and Validate                   |
         | ------------------------------------------ | -------- | ------------------------------------ |
         | VGG16 (linear dropout+batch norm) epoch300 | 0.782492 | train_acc=0.994729, val_acc=0.765598 | ckpt_VGG16_dropout_batchnorm_ep300.model | _info_0257.log |
@@ -96,13 +101,13 @@ Modified the template code of HW3 colab notebook, and organized the code structu
 
     - 調整好設定參數與訓練方式後，把training和validation合併，用更多資料量去訓練模型，  
         發現epoch 120的testing accuracy已達到 **82.01%**。  
-        在epoch來到120後，打開exponential learning rate decay持續訓練:
-        | Model                                      | Accuracy | Train              |
-        | ------------------------------------------ | -------- | ------------------ |
-        | VGG16 (linear dropout+batch norm) epoch180 | 0.846728 | train_acc=0.996616 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
-        | *other model performance*                  | ---      | ---                |
-        | VGG16 (linear dropout+batch norm) epoch120 | 0.820137 | train_acc=0.956829 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
-        | VGG16 (linear dropout+batch norm) epoch160 | 0.844637 | train_acc=0.994209 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
+        在epoch來到120後，打開exponential learning rate decay(gamma=0.9)持續訓練:
+        | Model                                      | Accuracy | Train    |
+        | ------------------------------------------ | -------- | -------- |
+        | VGG16 (linear dropout+batch norm) epoch180 | 0.846728 | 0.996616 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
+        | *other model performance*                  | ---      | ---      |
+        | VGG16 (linear dropout+batch norm) epoch120 | 0.820137 | 0.956829 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
+        | VGG16 (linear dropout+batch norm) epoch160 | 0.844637 | 0.994209 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
         
         最終，`VGG16 (linear dropout+batch norm)`在testing accuracy上得到 **84.67%** 準確率。  
 
@@ -163,7 +168,7 @@ Modified the template code of HW3 colab notebook, and organized the code structu
         RandomHorizontalFlip() ->
         RandomRotation(15)  
         ```
-        設定batch_size=32, learning_rate=0.001, exponential learning rate decay (gamma=0.9)，  
+        設定batch size=32, learning rate=0.001, exponential learning rate decay(gamma=0.9)，  
         先訓練到epoch=80，觀察表現：  
         | Model                             | Accuracy | Train and Validate                   |
         | --------------------------------- | -------- | ------------------------------------ |
@@ -198,9 +203,9 @@ Modified the template code of HW3 colab notebook, and organized the code structu
         | VGG16 (linear dropout+batch norm) epoch150 | 0.749627 | train_acc=0.957125, val_acc=0.741983 | ckpt_VGG16_dropout_batchnorm_ep150.model | _info_0257.log |
         | VGG16 (linear dropout+batch norm) epoch180 | 0.760084 | train_acc=0.964930, val_acc=0.742566 | ckpt_VGG16_dropout_batchnorm_ep180.model | _info_0257.log |
 
-        | Model                                      | Accuracy | Train              |
-        | ------------------------------------------ | -------- | ------------------ |
-        | VGG16 (linear dropout+batch norm) epoch180 | 0.846728 | train_acc=0.996616 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
+        | Model                                      | Accuracy | Train    |
+        | ------------------------------------------ | -------- | -------- |
+        | VGG16 (linear dropout+batch norm) epoch180 | 0.846728 | 0.996616 | ckpt_VGG16_dropout_batchnorm_final.model | _info_final_0257.log |
         
         最終模型準確率也會隨之提升，得到 **84.67%** 準確率。  
 
