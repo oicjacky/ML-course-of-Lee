@@ -8,7 +8,7 @@
 
 ## start_Pytorch.py
 
-See [Colab sample code](https://colab.research.google.com/drive/1CmkRJ5R41D2QIZXQLszMt68TWUrGd-yf):  
+See [Colab sample code](https://colab.research.google.com/drive/1CmkRJ5R41D2QIZXQLszMt68TWUrGd-yf) and [video]((https://www.youtube.com/watch?v=kQeezFrNoOg&feature=youtu.be)):  
 - 微分梯度計算automatic differentiation
 - 常用架構與函數PyTorch common functions in deep learning
 - Data Processing with PyTorch `DataSet`

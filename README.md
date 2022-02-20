@@ -115,7 +115,7 @@
     2. [Colab sample code](https://colab.research.google.com/drive/16d1Xox0OW-VNuxDn1pvy2UXFIPfieCb9)
 
 
-## [PyTorch Introduction](https://www.youtube.com/watch?v=kQeezFrNoOg&feature=youtu.be)
+## PyTorch Introduction
 
 - [Start PyTorch](https://github.com/oicjacky/ML-course-of-Lee/tree/main/start_pytorch)
     ```markdown
