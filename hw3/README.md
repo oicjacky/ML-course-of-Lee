@@ -5,15 +5,20 @@
 Modified the template code of HW3 colab notebook, and organized the code structure into the following scripts:
 
 ```markdown
-- preprocess.py
-- model.py
-- training.py
-- testing.py
-- main.py
-- logger.py
-- config.ini
-- submit.py
-- final.py
+Preprocess
+    - preprocess.py
+Modeling
+    - model.py
+    - training.py
+    - testing.py
+Training
+    - main.py
+Utils
+    - logger.py
+    - config.ini
+Submission
+    - final.py
+    - submit.py
 ```
 
 ## Questions:
