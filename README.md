@@ -52,7 +52,7 @@
     
     <u>**Task - Food Classification**</u>
 
-    此資料集[Food-11](https://reurl.cc/3DLavL)為網路上蒐集到的食物照片，共有11類:
+    此資料集[Food-11](https://www.kaggle.com/vermaavi/food11)為網路上蒐集到的食物照片，共有11類:
     
     - Training set: 9866張
     - Validation set: 3430張
@@ -118,12 +118,13 @@
 ## [PyTorch Introduction](https://www.youtube.com/watch?v=kQeezFrNoOg&feature=youtu.be)
 
 - [Start PyTorch](https://github.com/oicjacky/ML-course-of-Lee/tree/main/start_pytorch)
-  - 微分梯度計算automatic differentiation
-  - 常用架構與函數PyTorch common functions in deep learning
-  - Data Processing with PyTorch `DataSet`
-  - Mixed Presision Training in PyTorch
-
+    ```markdown
+    - start_Pytorch.py
+    - start_dataloader.py
+    - start_buildnn.py
+    - start_autograd.py
+    - start_optimizer.py
+    ```
     *Reference:*  
-    1. [PyTorch 官方文檔（ver 1.2.0）](https://pytorch.org/docs/1.2.0/)
-    2. [Cheat sheet](https://hackmd.io/@rh0jTfFDTO6SteMDq91tgg/HkDRHKLrU)
-    3. [Colab sample code](https://colab.research.google.com/drive/1CmkRJ5R41D2QIZXQLszMt68TWUrGd-yf)
+    1. [PyTorch documentation(ver. 1.10 stable release)](https://pytorch.org/docs/1.10/)
+    2. [Cheat sheet organized by Chen](https://hackmd.io/@rh0jTfFDTO6SteMDq91tgg/HkDRHKLrU)
