@@ -44,3 +44,35 @@ if __name__ == "__main__":
         for i, (pred_y, true_y) in  enumerate(zip(prediction, eval_y)):
             f.write('{},{},{}\n'.format(i, pred_y, true_y))
     print("Done")
+
+    #NOTE: confusion matrix
+    from sklearn.metrics import confusion_matrix, classification_report
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    sns.set()
+    target_names_tbl = {
+        0 : 'Bread', #麵包
+        1 : 'Dairy product', #如起司、牛奶、奶油
+        2 : 'Dessert', #甜食
+        3 : 'Egg', #蛋
+        4 : 'Fried food', #炸物
+        5 : 'Meat', #肉類
+        6 : 'Noodles/Pasta', #麵食
+        7 : 'Rice', #米飯
+        8 : 'Seafood', #海鮮
+        9 : 'Soup', #湯
+        10: 'Vegetable/Fruit'#蔬菜水果
+    }
+    def show_confusion_mat(y, y_pred, target_names, title=None):
+        confusion_mat = confusion_matrix(y, y_pred, normalize='true')
+        print(classification_report(y, y_pred, target_names=target_names))
+        sns.heatmap(confusion_mat,
+                    square = True, annot = True, fmt = '.2f', cbar = True,
+                    xticklabels = target_names,
+                    yticklabels = target_names)
+        plt.xlabel('predicted label')
+        plt.ylabel('true label')
+        plt.title(title)
+        plt.show()
+        #plt.savefig("food_confusion_mat.png", dpi=600, format='png')
+    show_confusion_mat(eval_y, prediction, list(target_names_tbl.values()))
