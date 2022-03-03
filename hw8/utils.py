@@ -46,6 +46,7 @@ def tokens2sentence(outputs, int2word):
 
 
 def computebleu(sentences, targets):
+    '''[BLEU with n-gram precision](https://coladrill.github.io/2018/10/20/%E6%B5%85%E8%B0%88BLEU%E8%AF%84%E5%88%86/)'''
     score = 0 
     assert (len(sentences) == len(targets))
     def cut_token(sentence):
