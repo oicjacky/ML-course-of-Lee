@@ -137,34 +137,34 @@ class VGG16_half(nn.Module):
         self.linear_dropout_rate = linear_dropout_rate
         # input [3, 128, 128]
         self.cnn = nn.Sequential(
-            nn.Conv2d(3, 64, 3, 1, 1),  # [64, 128, 128]
+            nn.Conv2d(3, 64, 5, 1, 2),  # [64, 128, 128]
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.Conv2d(64, 64, 3, 1, 1),  # [64, 128, 128]
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
+            # nn.Conv2d(64, 64, 3, 1, 1),  # [64, 128, 128]
+            # nn.BatchNorm2d(64),
+            # nn.ReLU(),
             nn.MaxPool2d(2, 2, 0),      # [64, 64, 64]
             
-            nn.Conv2d(64, 128, 3, 1, 1), # [128, 64, 64]
+            nn.Conv2d(64, 128, 5, 1, 2), # [128, 64, 64]
             nn.BatchNorm2d(128),
             nn.ReLU(),
-            nn.Conv2d(128, 128, 3, 1, 1), # [128, 64, 64]
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
+            # nn.Conv2d(128, 128, 3, 1, 1), # [128, 64, 64]
+            # nn.BatchNorm2d(128),
+            # nn.ReLU(),
             nn.MaxPool2d(2, 2, 0),      # [128, 32, 32]
 
-            nn.Conv2d(128, 256, 3, 1, 1), # [256, 32, 32]
-            nn.BatchNorm2d(256),
-            nn.ReLU(),
-            nn.Conv2d(256, 256, 3, 1, 1), # [256, 32, 32]
+            nn.Conv2d(128, 256, 7, 1, 3), # [256, 32, 32]
             nn.BatchNorm2d(256),
             nn.ReLU(),
             # nn.Conv2d(256, 256, 3, 1, 1), # [256, 32, 32]
             # nn.BatchNorm2d(256),
             # nn.ReLU(),
+            # nn.Conv2d(256, 256, 3, 1, 1), # [256, 32, 32]
+            # nn.BatchNorm2d(256),
+            # nn.ReLU(),
             nn.MaxPool2d(2, 2, 0),      # [256, 16, 16]
 
-            nn.Conv2d(256, 512, 3, 1, 1), # [512, 16, 16]
+            nn.Conv2d(256, 512, 7, 1, 3), # [512, 16, 16]
             nn.BatchNorm2d(512),
             nn.ReLU(),
             # nn.Conv2d(512, 512, 3, 1, 1), # [512, 16, 16]
@@ -175,29 +175,29 @@ class VGG16_half(nn.Module):
             # nn.ReLU(),
             nn.MaxPool2d(2, 2, 0),       # [512, 8, 8]
             
+            nn.Conv2d(512, 512, 7, 1, 3), # [512, 8, 8]
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
             # nn.Conv2d(512, 512, 3, 1, 1), # [512, 8, 8]
             # nn.BatchNorm2d(512),
             # nn.ReLU(),
             # nn.Conv2d(512, 512, 3, 1, 1), # [512, 8, 8]
             # nn.BatchNorm2d(512),
             # nn.ReLU(),
-            # nn.Conv2d(512, 512, 3, 1, 1), # [512, 8, 8]
-            # nn.BatchNorm2d(512),
-            # nn.ReLU(),
-            # nn.MaxPool2d(2, 2, 0),       # [512, 4, 4]
+            nn.MaxPool2d(2, 2, 0),       # [512, 4, 4]
         )
         self.fc = nn.Sequential(
-            nn.Linear(512*8*8, 1500),
-            nn.BatchNorm1d(1500) if self.linear_batch_norm else nn.Identity(),
+            nn.Linear(512*4*4, 4096),
+            nn.BatchNorm1d(4096) if self.linear_batch_norm else nn.Identity(),
             nn.ReLU(),
             nn.Dropout(self.linear_dropout_rate) if self.linear_dropout else nn.Identity(),
 
-            nn.Linear(1500, 512),
-            nn.BatchNorm1d(512) if self.linear_batch_norm else nn.Identity(),
+            nn.Linear(4096, 1024),
+            nn.BatchNorm1d(1024) if self.linear_batch_norm else nn.Identity(),
             nn.ReLU(),
             nn.Dropout(self.linear_dropout_rate) if self.linear_dropout else nn.Identity(),
 
-            nn.Linear(512, 128),
+            nn.Linear(1024, 128),
             nn.ReLU(),
             nn.Linear(128, 11)
         )
