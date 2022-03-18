@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     print("[Reading evaluation data] using opencv(cv2) read images into np.array")
     _p = lambda p: os.path.join(DATA_DIR, p)
-    eval_x, eval_y = Preprocessor.readfile(_p("evaluation"), True)
+    eval_x, eval_y, files = Preprocessor.readfile(_p("evaluation"), True)
     eval_set = ImgDataset(eval_x, eval_y, Preprocessor.test_transform)
     eval_loader = DataLoader(eval_set, batch_size=32, shuffle=False)
     
@@ -40,9 +40,9 @@ if __name__ == "__main__":
 
     #將結果寫入 csv 檔
     with open(PREDICTION, 'w') as f:
-        f.write('Id,Category,GroundTrue\n')
-        for i, (pred_y, true_y) in  enumerate(zip(prediction, eval_y)):
-            f.write('{},{},{}\n'.format(i, pred_y, true_y))
+        f.write('Id,Category,GroundTrue,FileName\n')
+        for i, (pred_y, true_y, file) in  enumerate(zip(prediction, eval_y, files)):
+            f.write('{},{},{},{}\n'.format(i, pred_y, true_y, file))
     print("Done")
 
     #NOTE: confusion matrix

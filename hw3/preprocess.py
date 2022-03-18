@@ -27,7 +27,7 @@ class Preprocessor:
     ])
 
     @staticmethod
-    def readfile(path, label: bool):
+    def readfile(path, label: bool, return_path: bool= False):
         ''' Read image data of Food-11 by `cv2`.
         Args:
             label: boolean, indicate whether to return label (y) or not. '''
@@ -39,7 +39,13 @@ class Preprocessor:
             x[i, :, :] = cv2.resize(img, (128, 128))
             if label:
                 y[i] = int(file.split("_")[0])  # filename's format: "[class]_[index].jpg"
-        return (x, y) if label else x
+        if label:
+            if not return_path:
+                return x, y
+            else:
+                return x, y, image_dir
+        else:
+            return x
 
 
 class ImgDataset(Dataset):
