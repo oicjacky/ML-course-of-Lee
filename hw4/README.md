@@ -20,7 +20,7 @@ Modified the template code of HW4 colab notebook, and organized the code structu
 - (1%) 請說明你實作的 RNN 的模型架構、word embedding 方法、訓練過程 (learning curve) 和準確率為何？ (盡量是過 public strong baseline 的 model)
     
     此RNN模型主要由多層LSTM加上後面一層linear+sigmoid layer，最後output probability with $\geq$ 0.5=positive; $<$ 0.5=negative.
-    <img src="..\images\hw4_pic01.PNG" style="vertical-align:middle; margin:0px 30px" width="60%" >
+    <img src="../images/hw4_pic01.PNG" style="vertical-align:middle; margin:0px 30px" width="60%" >
 
     | Layer            | Detail                                                                                                 |
     | ---------------- | ------------------------------------------------------------------------------------------------------ |
@@ -41,7 +41,7 @@ Modified the template code of HW4 colab notebook, and organized the code structu
     | ---     | strong baseline | 0.82011       | 0.82171      |
     | ---     | simple baseline | 0.76917       | 0.76978      |
     
-    <img src="..\images\hw4_pic03.PNG" style="vertical-align:middle; margin:0px 30px" width="80%" >
+    <img src="../images/hw4_pic03.PNG" style="vertical-align:middle; margin:0px 30px" width="80%" >
 <!--|0.89026|0.82585         |0.82588       |0.82581      |the same but a little worse, concate (min, max, mean) of LSTM's hidden states  -->
 <!--|0.86807|0.82290         |0.82534       |0.82496      | only concate mean of LSTM's hidden states  -->
     
