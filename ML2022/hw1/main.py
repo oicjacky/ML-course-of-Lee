@@ -61,6 +61,8 @@ if __name__ == "__main__":
         'batch_size': 64, # 256, 
         'learning_rate': 1e-5,              
         'early_stop': 40, # 400,    # If model has not improved for this many consecutive epochs, stop training.     
-        'save_path': './models/model.ckpt'  # Your model will be saved here.
+        'save_path': './models/model.ckpt',  # Your model will be saved here.
+        'exponential_lr': True,
+        'exponential_lr_gamma': 0.9,
     }
     main(config)
