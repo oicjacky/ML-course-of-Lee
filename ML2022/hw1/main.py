@@ -15,8 +15,8 @@ def main(config):
 
     # train_data size: 2699 x 118 (id + 37 states + 16 features x 5 days) 
     # test_data size: 1078 x 117 (without last day's positive rate)
-    train_data = pd.read_csv(r'E:\Download\dataset\covid19\covid_train.csv').values
-    test_data = pd.read_csv(r'E:\Download\dataset\covid19\covid_test.csv').values
+    train_data = pd.read_csv(config['train_data']).values
+    test_data = pd.read_csv(config['test_data']).values
     train_data, valid_data = train_valid_split(train_data, config['valid_ratio'], config['seed'])
 
     # Print out the data size.
@@ -55,14 +55,17 @@ if __name__ == "__main__":
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     config = {
         'seed': 5201314,      # Your seed number, you can pick your lucky number. :)
-        'select_all': True,   # Whether to use all features.
+        'select_all': False,   # Whether to use all features.
         'valid_ratio': 0.2,   # validation_size = train_size * valid_ratio
-        'n_epochs': 100, # 3000,     # Number of epochs.            
-        'batch_size': 64, # 256, 
-        'learning_rate': 1e-5,              
-        'early_stop': 40, # 400,    # If model has not improved for this many consecutive epochs, stop training.     
+        'n_epochs': 3000,     # Number of epochs.            
+        'batch_size': 256, 
+        'learning_rate': 1e-3,              
+        'early_stop': 400,    # If model has not improved for this many consecutive epochs, stop training.     
         'save_path': './models/model.ckpt',  # Your model will be saved here.
         'exponential_lr': True,
         'exponential_lr_gamma': 0.9,
+        'weight_decay': 0.01,
+        'train_data' : r'E:\Download\dataset\covid19\covid_train.csv',
+        'test_data' : r'E:\Download\dataset\covid19\covid_test.csv',
     }
     main(config)

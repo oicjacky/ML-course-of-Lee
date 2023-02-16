@@ -13,7 +13,7 @@ def trainer(train_loader, valid_loader, model, config, device):
     # Define your optimization algorithm. 
     # TODO: Please check https://pytorch.org/docs/stable/optim.html to get more available algorithms.
     # TODO: L2 regularization (optimizer(weight decay...) or implement by your self).
-    optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'], weight_decay=0.01)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config['learning_rate'], weight_decay=config['weight_decay'])
     if config['exponential_lr']:
         scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=config['exponential_lr_gamma'], verbose=True)
     writer = SummaryWriter() # Writer of tensoboard.
@@ -72,5 +72,5 @@ def trainer(train_loader, valid_loader, model, config, device):
         if early_stop_count >= config['early_stop']:
             print('\nModel is not improving, so we halt the training session.')
             return
-        if config['exponential_lr']:
+        if config['exponential_lr'] and epoch % 200 == 0:
             scheduler.step()
