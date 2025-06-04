@@ -170,7 +170,7 @@ if __name__ == '__main__':
         print(f'[{i}/{len(train_loader)}] batch data with size {batch_size}')
         print(inputs, inputs.size(), labels, sep='\n')
         if i == 2:
-            import pdb
-            pdb.set_trace()
+            # Debug placeholder removed
+            pass
 
     print("Done")

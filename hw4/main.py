@@ -252,7 +252,6 @@ def main_BOW():
         outputs = model(bow_vector.T.to('cuda'))
         outputs = outputs.squeeze()
         print(sen, 'with probabilty', outputs.item())
-        import pdb; pdb.set_trace()
     print('Done')
 
 

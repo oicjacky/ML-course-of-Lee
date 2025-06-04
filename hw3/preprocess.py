@@ -117,4 +117,4 @@ if __name__ == "__main__":
     mean, std = online_mean_and_sd(train_loader)
     print('The mean and std used by `transforms.Normalize` is', mean, 'and', std)
 
-    import pdb; pdb.set_trace()
+    # Debug statement removed

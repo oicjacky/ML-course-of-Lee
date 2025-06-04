@@ -31,7 +31,7 @@ if __name__ == "__main__":
     config.read(r'./config.ini')
 
     DATA_DIR = config.get('Data', 'data_dir')
-    BATCH_SIZE = config.getint('Model', 'batch_size')  # 128 will lead insufficient memory 
+    BATCH_SIZE = config.getint('Model', 'batch_size')  # 128 will lead insufficient memory
     LEARNING_RATE = config.getfloat('Model', 'learning_rate')
     EPOCH = config.getint('Model', 'epoch')
     EXPONENTIAL_LR = config.getboolean('Model', 'exponential_lr')
@@ -39,6 +39,8 @@ if __name__ == "__main__":
     PREDICTION = config.get('File', 'prediction')
     CHECKPOINT_MODEL = config.get('File', 'checkpoint_model')
 
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     LOGGER.info("[Reading image] using opencv(cv2) read images into np.array")
     _p = lambda p: os.path.join(DATA_DIR, p)
@@ -58,13 +60,14 @@ if __name__ == "__main__":
     model = Classifier()
     #model = VGG16(linear_batch_norm=False, linear_dropout=False, linear_dropout_rate=0.5)
     #model = torch.load(os.path.join('.', CHECKPOINT_MODEL))
-    model.cuda()
+    model.to(device)
     loss = nn.CrossEntropyLoss() # 因為是 classification task，所以 loss 使用 CrossEntropyLoss
     optimizer = torch.optim.Adam(model.parameters(), lr = LEARNING_RATE) # Adam optimizer
     if EXPONENTIAL_LR:
         scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=EXP_GAMMA, verbose=True)
     
     best_acc = 0
+    early_stop = 0
     for epoch in range(EPOCH):
         LOGGER.info("[EPOCH] Now is {}".format(epoch))
         epoch_start_time = time.time()
@@ -75,10 +78,10 @@ if __name__ == "__main__":
 
         LOGGER.info("[TRAIN]")
         model.train() # 確保 model 是在 train model (開啟 Dropout 等...
-        train_acc, train_loss = train_loop(train_loader, model, loss, optimizer, train_acc, train_loss)
+        train_acc, train_loss = train_loop(train_loader, model, loss, optimizer, device, train_acc, train_loss)
         LOGGER.info("[VALIDATE]")
         model.eval()
-        val_acc, val_loss = test_loop(val_loader, model, loss, val_acc, val_loss)
+        val_acc, val_loss = test_loop(val_loader, model, loss, device, val_acc, val_loss)
 
         #將結果 print 出來
         LOGGER.info('[%03d/%03d] %2.2f sec(s) Train Acc: %3.6f Loss: %3.6f | Val Acc: %3.6f loss: %3.6f' % \
