@@ -32,8 +32,8 @@ if not capture.isOpened():
 while True:
     ret, frame = capture.read()
     if frame is None:
-        print(ret, frame.shape)
-        pass
+        print('Unable to grab frame')
+        break
     ## [apply]
     #update the background model
     fgMask = backSub.apply(frame)

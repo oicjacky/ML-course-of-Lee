@@ -4,8 +4,6 @@ import torchvision.transforms as transforms
 from torchvision import models
 from PIL import Image
 
-import pdb
-
 MODEL = models.densenet121(pretrained=True) # pretrained with [imagenet](https://pytorch.org/vision/0.8/datasets.html#imagenet)
 MODEL.eval() # since we are using our model only for inference, switch to `eval` mode
 IMAGENET_CLASS_INDEX = json.load(open('./imagenet_class_index.json')) # [source of dataset](https://image-net.org/challenges/LSVRC/2012/)

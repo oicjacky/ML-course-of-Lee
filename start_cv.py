@@ -1,8 +1,10 @@
 # [OpenCV](https://shengyu7697.github.io/python-opencv-resize/)
+import os
 import cv2
 import matplotlib.pyplot as plt
 
-file_path = r"images\Machine-Learning-HW4-RNN_1.PNG"
+# Use an existing demo image in the repository
+file_path = os.path.join("images", "hw4_pic01.PNG")
 image = cv2.imread(file_path)
 image = cv2.resize(image, (256, 256), interpolation=cv2.INTER_AREA)
 print("image size is", image.shape)
